@@ -74,7 +74,7 @@ RM_IHPSG13_1P_256x64_c2_bm_bis m_ihp_sram (
     .A_BM(8'hFF),
     .A_BIST_CLK(1'b0),
     .A_BIST_EN(1'b0),
-    .A_BIST_MEN{1'b0),
+    .A_BIST_MEN(1'b0),
     .A_BIST_WEN(1'b0),
     .A_BIST_REN(1'b0),
     .A_BIST_ADDR(1'b0),

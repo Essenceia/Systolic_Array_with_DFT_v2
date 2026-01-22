@@ -1,11 +1,3 @@
-/*
- * tt_um_factory_test.v
- *
- * Test user module
- *
- * Author: Sylvain Munaut <tnt@246tNt.com>
- */
-
 `default_nettype none
 
 module tt_um_essen_sram (
@@ -61,7 +53,7 @@ module tt_um_essen_sram (
 		.r_en_i(r_en_q),
 		.r_addr_i(addr_q),
 		.r_data_o(r_data)
-	):
+	);
 
 
 	/* hold read data */ 
@@ -70,9 +62,9 @@ module tt_um_essen_sram (
 	always @(posedge clk) begin
 		r_valid_q <= r_en_q;
 		if (r_valid_q) 
-			r_data_q <= r_data
+			r_data_q <= r_data;
 	end
 
-	assign uo_out <= r_data_q;
+	assign uo_out = r_data_q;
 		
 endmodule  // tt_um_factory_test
