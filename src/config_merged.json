@@ -1,0 +1,73 @@
+{
+  "PL_TARGET_DENSITY_PCT": 60,
+  "CLOCK_PERIOD": 20,
+  "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
+  "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
+  "RUN_LINTER": 1,
+  "LINTER_INCLUDE_PDK_MODELS": 1,
+  "CLOCK_PORT": "clk",
+  "RUN_KLAYOUT_XOR": 0,
+  "RUN_KLAYOUT_DRC": 0,
+  "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
+  "TOP_MARGIN_MULT": 1,
+  "BOTTOM_MARGIN_MULT": 1,
+  "LEFT_MARGIN_MULT": 6,
+  "RIGHT_MARGIN_MULT": 6,
+  "FP_SIZING": "absolute",
+  "GRT_ALLOW_CONGESTION": 1,
+  "FP_IO_HLENGTH": 2,
+  "FP_IO_VLENGTH": 2,
+  "FP_PDN_VPITCH": 38.87,
+  "RUN_CTS": 1,
+  "FP_PDN_MULTILAYER": 0,
+  "MAGIC_DEF_LABELS": 0,
+  "MAGIC_WRITE_LEF_PINONLY": 1,
+  "DESIGN_NAME": "tt_um_essen_sram",
+  "VERILOG_FILES": [
+    "dir::*.v"
+  ],
+  "DIE_AREA": "0 0 419.20 313.74",
+  "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13g2/def/tt_block_2x2_pgvdd.def",
+  "VDD_PIN": "VPWR",
+  "GND_PIN": "VGND",
+  "RT_MAX_LAYER": "TopMetal1",
+  "STA_MACRO_PRIORITIZE_NL":false,
+  "PDN_CONNECT_MACROS_TO_GRID": true,
+  "PDN_MACRO_CONNECTIONS": ["m_ihp_sram VPWR VGND VDD VSS"],
+    "MACROS": {
+        "RM_IHPSG13_1P_256x8_c3_bm_bist": {
+            "instances": {
+                "m_ihp_sram": {
+                    "location": [
+                        10,
+                        20
+                    ],
+                    "orientation": "N"
+                }
+            },
+            "gds": [
+                "pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x8_c3_bm_bist.gds"
+            ],
+            "lef": [
+                "pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x8_c3_bm_bist.lef"
+            ],
+			"vh":[
+				"dir::RM_IHPSG13_1P_256x8_c3_bm_bist.vh"
+			],
+            "nl": [],
+            "lib": {
+				"nom_typ_1p20V_25C": [
+                	"pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_typ_1p20V_25C.lib"
+				],
+				"nom_fast_1p32V_m40C":[
+                	"pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_fast_1p32V_m55C.lib"
+				],
+				"nom_slow_1p08V_125C":[
+                	"pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_slow_1p08V_125C.lib"
+				]	
+			},
+            "spice": [],
+            "sdf": {}
+        }
+    }
+}
