@@ -10,6 +10,7 @@
     "ui_in[0]"
   ],
   "FALLBACK_SDC_FILE": "dir::project.sdc",
+  "SYNTH_MUL_BOOTH": "True",
   "RUN_KLAYOUT_XOR": 0,
   "RUN_KLAYOUT_DRC": 0,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
@@ -29,14 +30,16 @@
   "DESIGN_NAME": "tt_um_essen",
   "VERILOG_FILES": [
     "dir::tt_um_essen.v",
-    "dir::booth_radix4_enc.v",
     "dir::bsc.v",
     "dir::jtag.v",
     "dir::mac_fsm.v",
-    "dir::booth_radix4_mul.v",
     "dir::ir.v",
     "dir::mac.v",
-    "dir::mac_unit.v"
+    "dir::mac_unit.v",
+    "dir::bf16/src/bf16_add.v",
+    "dir::bf16/src/bf16_mul.v",
+    "dir::bf16/src/booth_unsigned_mul.v",
+    "dir::bf16/src/lzc.v"
   ],
   "DIE_AREA": "0 0 419.52 313.74",
   "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13g2/def/tt_block_2x2_pgvdd.def",
