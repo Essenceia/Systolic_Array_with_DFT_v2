@@ -1,55 +1,15 @@
 {
   "PL_TARGET_DENSITY_PCT": 60,
-  "CLOCK_PERIOD": 20,
+  "CLOCK_PERIOD": 10,
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
   "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
   "RUN_LINTER": 1,
   "LINTER_INCLUDE_PDK_MODELS": 1,
-  "CLOCK_PORT": "clk",
-  "MAGIC_EXT_UNIQUE": "notopports",
-  "STA_MACRO_PRIORITIZE_NL": false,
-  "PDN_CONNECT_MACROS_TO_GRID": true,
-  "PDN_MACRO_CONNECTIONS": [
-    "m_ihp_sram VPWR VGND VDD! VSS!",
-    "m_ihp_sram VPWR VGND VDDARRAY! VSS!"
+  "CLOCK_PORT": [
+    "clk",
+    "ui_in[0]"
   ],
-  "MACROS": {
-    "RM_IHPSG13_1P_256x8_c3_bm_bist": {
-      "instances": {
-        "m_ihp_sram": {
-          "location": [
-            100,
-            120
-          ],
-          "orientation": "N"
-        }
-      },
-      "gds": [
-        "pdk_dir::libs.ref/sg13g2_sram/gds/RM_IHPSG13_1P_256x8_c3_bm_bist.gds"
-      ],
-      "lef": [
-        "pdk_dir::libs.ref/sg13g2_sram/lef/RM_IHPSG13_1P_256x8_c3_bm_bist.lef"
-      ],
-      "vh": [
-        "dir::RM_IHPSG13_1P_256x8_c3_bm_bist.vh"
-      ],
-      "nl": [],
-      "lib": {
-        "nom_typ_1p20V_25C": [
-          "pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_typ_1p20V_25C.lib"
-        ],
-        "nom_fast_1p32V_m40C": [
-          "pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_fast_1p32V_m55C.lib"
-        ],
-        "nom_slow_1p08V_125C": [
-          "pdk_dir::libs.ref/sg13g2_sram/lib/RM_IHPSG13_1P_256x8_c3_bm_bist_slow_1p08V_125C.lib"
-        ]
-      },
-      "spice": [],
-      "sdf": {}
-    }
-  },
-  "PDN_CFG": "dir::pdn_cfg.tcl",
+  "FALLBACK_SDC_FILE": "dir::project.sdc",
   "RUN_KLAYOUT_XOR": 0,
   "RUN_KLAYOUT_DRC": 0,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
@@ -66,10 +26,17 @@
   "FP_PDN_MULTILAYER": 0,
   "MAGIC_DEF_LABELS": 0,
   "MAGIC_WRITE_LEF_PINONLY": 1,
-  "DESIGN_NAME": "tt_um_essen_sram",
+  "DESIGN_NAME": "tt_um_essen",
   "VERILOG_FILES": [
-    "dir::tt_um_essen_sram.v",
-    "dir::RM_IHPSG13_1P_256x8_c3_bm_bist.vh"
+    "dir::tt_um_essen.v",
+    "dir::booth_radix4_enc.v",
+    "dir::bsc.v",
+    "dir::jtag.v",
+    "dir::mac_fsm.v",
+    "dir::booth_radix4_mul.v",
+    "dir::ir.v",
+    "dir::mac.v",
+    "dir::mac_unit.v"
   ],
   "DIE_AREA": "0 0 419.52 313.74",
   "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13g2/def/tt_block_2x2_pgvdd.def",
