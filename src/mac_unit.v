@@ -28,11 +28,7 @@ module mac_unit #(
 ); 
 reg  [W-1:0] data_q, add_q;
 reg  [W-1:0] weight_q;
-
 wire [W-1:0] mul;
-
-wire [W-1:0] debug_mul; 
-wire [W-1:0] debug_add; 
 
 always @(posedge clk) 
 	if (step_i) data_q <= data_i;
@@ -70,7 +66,7 @@ bf16_add m_add(
 
 	.s_o(res_o[15]),
 	.e_o(res_o[14:7]),
-	.m_o(res_o[6:0])		.
+	.m_o(res_o[6:0])
 );
 
 assign data_o = data_q;
@@ -81,7 +77,7 @@ always @(*) begin
 		2'b00: jtag_ureg_data_o = weight_q; 
 		2'b01: jtag_ureg_data_o = data_q; 
 		2'b10: jtag_ureg_data_o = add_q; 
-		2'b11: jtag_ureg_data_o = res_o;
+		2'b11: jtag_ureg_data_o = mul;
 	endcase 
 end
 endmodule

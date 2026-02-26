@@ -13,7 +13,7 @@ module tt_um_essen(
 ); 
 
 localparam BSC_CHAIN_W = 7; // bsc scan chain length 
-localparam UREG_DATA_W = 8;
+localparam UREG_DATA_W = 16;
 localparam UREG_ADDR_W = 4;
 
 /* IO direction, 0: input, 1: output */
@@ -44,6 +44,8 @@ wire       data_mode;
 wire       data_rst; 
 wire [7:0] data;
 wire       result_v;
+(* keep = "true" *) 
+wire [7:0] result_unused; // TODO proper result streaming
 wire [7:0] result;
 
 assign data_v_bsc    = uio_in[1];
@@ -146,7 +148,7 @@ jtag #(.IR_W(3),
 );
 
 // MAC design
-mac #(.W(8), .N(2)) m_2x2_systolic_mac(
+mac #(.W(16), .N(2)) m_2x2_systolic_mac(
 	.clk(clk),
 	.rst_n(rst_n), 
 	.ena(ena),
@@ -154,13 +156,13 @@ mac #(.W(8), .N(2)) m_2x2_systolic_mac(
 	.data_v_i(data_v),
 	.data_mode_i(data_mode),
 	.data_rst_addr_i(data_rst),
-	.data_i(data),
+	.data_i({data, 8'h00}), // TODO correctly rework data accumulation in mac
 
 	.jtag_ureg_addr_i(ureg_addr),
 	.jtag_ureg_data_o(ureg_data),
 
 	.result_v_o(result_v),
-	.result_o(result)
+	.result_o({result_unused, result})
 );
 
 endmodule
