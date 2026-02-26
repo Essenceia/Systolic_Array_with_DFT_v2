@@ -26,23 +26,13 @@ module mac_unit #(
 	output wire [W-1:0]  data_o, // left side output data, will become the right side input data of the next unit leftwards
 	output wire [W-1:0]  res_o // result, become the top input data for the next unit bellow
 ); 
-localparam MAX_DATA = {1'b0, {W-1{1'b1}}};
-localparam MIN_DATA = {1'b1, {W-1{1'b0}}};
+reg  [W-1:0] data_q, add_q;
+reg  [W-1:0] weight_q;
 
-reg  [W-1:0]  data_q, add_q;
-reg  [W-1:0]  weight_q;
+wire [W-1:0] mul;
 
-wire [2*W-1:0] mul;
-wire           mul_sign; 
-
-wire [2*W-1:0] add_extended; 
-wire [W-1:0]   trunc_add; // truncated addition 
-wire [W-1:0]   remain_add; 
-wire           unused_carry;
-wire           overflow, underflow; 
-
-wire [2*W:0]   debug_mul; 
-wire [2*W-1:0] debug_add; 
+wire [W-1:0] debug_mul; 
+wire [W-1:0] debug_add; 
 
 always @(posedge clk) 
 	if (step_i) data_q <= data_i;
@@ -53,26 +43,35 @@ always @(posedge clk)
 always @(posedge clk) 
 	if (wr_weight_v_i) weight_q <= weight_i;
 
-booth_randix4_mul m_mul(
-	.data_i(data_q),
-	.w_i(weight_q),
-	.res_o(mul),
-	.res_sign_o(mul_sign)
+// bfloat16 multiplication 
+bf16_mul m_mul(
+	.sa_i(weight_q[15]),
+	.ea_i(weight_q[14:7]),
+	.ma_i(weight_q[6:0]),
+
+	.sb_i(data_q[15]),
+	.eb_i(data_q[14:7]),
+	.mb_i(data_q[6:0]),
+
+	.s_o(mul[15]),
+	.e_o(mul[14:7]),
+	.m_o(mul[6:0])	
 );
 
-// Conforming to user expectations of having a soft max to round out
-// numbers and not let the results overflow and simply be sliced.
-// Forced the need for a costly 16b addition though.
-assign add_extended = {{W{add_q[W-1]}}, add_q};
-assign {unused_carry, remain_add, trunc_add } = mul + add_extended;
+// bfloat16 addition 
+bf16_add m_add(
+	.sa_i(mul[15]),
+	.ea_i(mul[14:7]),
+	.ma_i(mul[6:0]),
 
-assign debug_mul = {mul_sign, mul}; 
-assign debug_add = {remain_add[W-1:0], trunc_add}; 
+	.sb_i(add_q[15]),
+	.eb_i(add_q[14:7]),
+	.mb_i(add_q[6:0]),
 
-// soft max 
-assign overflow  = ~remain_add[W-1] ? |{remain_add, trunc_add[W-1]} : 0; 
-assign underflow = remain_add[W-1] ? ~&{remain_add, trunc_add[W-1]} : 0; 
-assign res_o = overflow ? MAX_DATA : underflow ? MIN_DATA : trunc_add;  
+	.s_o(res_o[15]),
+	.e_o(res_o[14:7]),
+	.m_o(res_o[6:0])		.
+);
 
 assign data_o = data_q;
 
@@ -82,7 +81,7 @@ always @(*) begin
 		2'b00: jtag_ureg_data_o = weight_q; 
 		2'b01: jtag_ureg_data_o = data_q; 
 		2'b10: jtag_ureg_data_o = add_q; 
-		2'b11: jtag_ureg_data_o = remain_add;
+		2'b11: jtag_ureg_data_o = res_o;
 	endcase 
 end
 endmodule
