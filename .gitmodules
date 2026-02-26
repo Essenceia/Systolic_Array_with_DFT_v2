@@ -1,3 +1,6 @@
 [submodule "bf16"]
 	path = bf16
 	url = git@github.com:Essenceia/BFloat16.git
+[submodule "src/bf16"]
+	path = src/bf16
+	url = git@github.com:Essenceia/BFloat16.git
