@@ -6,13 +6,14 @@ SIM ?= icarus
 FST ?= -fst # Use more efficient FST format
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = tt_um_factory_test.v
+BF16_LIB_DIR = $(PWD)/../src/bf16/src
+PROJECT_SOURCES = 
 
 ifneq ($(GATES),yes)
 
 # RTL simulation:
 SIM_BUILD				= sim_build/rtl
-VERILOG_SOURCES += $(addprefix $(SRC_DIR)/,$(PROJECT_SOURCES))
+VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_LIB_DIR)/*.v)
 
 else
 
