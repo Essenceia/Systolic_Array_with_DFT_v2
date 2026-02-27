@@ -45,5 +45,7 @@
   "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13g2/def/tt_block_2x2_pgvdd.def",
   "VDD_PIN": "VPWR",
   "GND_PIN": "VGND",
-  "RT_MAX_LAYER": "TopMetal1"
+  "RT_MAX_LAYER": "TopMetal1",
+  "SYNTH_AUTONAME": "True",
+  "SYNTH_HIERARCHY_MODE":"keep" 
 }
