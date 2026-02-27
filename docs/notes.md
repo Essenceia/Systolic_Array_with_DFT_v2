@@ -305,4 +305,28 @@ classic leading zero count (LZC) by a more optimized leading zero anticipation l
 already on the potenciel plans in case timing needed to be improved. 
 
 But, before implementing the LZA, and paying the cost in additional logic, I want to revisit the 
-rounding to zero logic and see if I cannot improve latency there first.  
+existing logic and see what I can improve. 
+
+### Improving existing logic
+
+#### Multiplier 
+
+Looking at this cirtical path, we can see that in the multiplier the propagation time is mainly occupied 
+by going though the multiplier. Given this booth multiplier is inffered by yosys and I don't fell like 
+writting a booth multiplier right away I will consider that as irreducible time. 
+
+We can note how, before reaching the booth multiplier I have a dependacy on the `b_nzero` net. This is 
+for determining the value of the hidden 1 to properly handle the case when one of the inputs is zero. 
+Exept ... I can also handle this after the mantissa multiplication, which I do as part of the 
+subnormal rounding to zero. So I can start by removing this dependancy saving me ~0,9ns. 
+
+```
+-assign {ma, mb} = {{a_nzero, ma_i}, {b_nzero, mb_i}}; // hidden bit is 0 on 0.0
++assign {ma, mb} = {{1'b1, ma_i}, {1'b1, mb_i}}; // zero case will be handled by zero masked on output
+```
+
+### Adder 
+
+Now to tackle the adder where most of the propagation time is used up ~8.5ns, hopefully this should give me as 
+much opportunities for optimization. 
+ 
