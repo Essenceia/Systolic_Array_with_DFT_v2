@@ -391,8 +391,13 @@ This is more expensive in terms of latency than using just the same cell but wit
      1    0.003832    0.052847    0.210063    6.159123 ^ m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/m_add/rebuffer983/X (sg13g2_buf_1)RUN_POST_GRT_RESIZER_TIMING
 ``` 
 
-So, I forced such re-sizing to occure post CTS and GRT, and voila!
+So, I forced such re-sizing to occure post CTS and GRT, changes to `config.json` :
+```json
++  "RUN_POST_CTS_RESIZER_TIMING": "True", 
++  "RUN_POST_GRT_RESIZER_TIMING": "True",
+```
 
+And voila: 
 ```
 ┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┓
 ┃                      ┃ Hold     ┃ Reg to   ┃          ┃          ┃ of which  ┃ Setup    ┃           ┃          ┃           ┃ of which ┃           ┃          ┃
