@@ -25,4 +25,9 @@ stream of responses.
 But using an SRAM for this is totally overkill: they are too large to be a good 
 replacement for a 64b of ff storage. 
 
-So I should just add the ff bank, still no use for the SRAM though.    
+So I should just add the ff bank, still no use for the SRAM though.   
+
+## Desing
+
+- [ ] cleanup MAC FSM 
+    - [ ] rework output fifo and make it bank based to output only a continous data stream 
