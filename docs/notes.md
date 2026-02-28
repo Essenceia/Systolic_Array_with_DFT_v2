@@ -379,5 +379,32 @@ So close ...just a bit more
 └──────────────────────┴──────────┴──────────┴──────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┘
 ```
 
+#### Last push 
 
+Looking at the timing of a new critical path we notice quite a lot of single drive strenght cells followed by a buffer. 
+This is more expensive in terms of latency than using just the same cell but with a higher drive strength strength. 
+```
+                      0.075975    0.000320    5.601965 v m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/m_mul/e_o_sg13g2_xor2_1_X/A (sg13g2_xor2_1)
+     5    0.026197    0.366466    0.345537    5.947501 ^ m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/m_mul/e_o_sg13g2_xor2_1_X/X (sg13g2_xor2_1)
+                                                         m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/mul[8] (net)
+                      0.366475    0.001559    5.949060 ^ m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/m_add/rebuffer983/A (sg13g2_buf_1)
+     1    0.003832    0.052847    0.210063    6.159123 ^ m_2x2_systolic_mac/g_unit_x[0].g_unit_y[0].m_unit/m_add/rebuffer983/X (sg13g2_buf_1)RUN_POST_GRT_RESIZER_TIMING
+``` 
 
+So, I forced such re-sizing to occure post CTS and GRT, and voila!
+
+```
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┓
+┃                      ┃ Hold     ┃ Reg to   ┃          ┃          ┃ of which  ┃ Setup    ┃           ┃          ┃           ┃ of which ┃           ┃          ┃
+┃                      ┃ Worst    ┃ Reg      ┃          ┃ Hold Vio ┃ reg to    ┃ Worst    ┃ Reg to    ┃ Setup    ┃ Setup Vio ┃ reg to   ┃ Max Cap   ┃ Max Slew ┃
+┃ Corner/Group         ┃ Slack    ┃ Paths    ┃ Hold TNS ┃ Count    ┃ reg       ┃ Slack    ┃ Reg Paths ┃ TNS      ┃ Count     ┃ reg      ┃ Violatio… ┃ Violati… ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━┩
+│ Overall              │ 0.1223   │ 0.1223   │ 0.0000   │ 0        │ 0         │ 0.6111   │ 0.6111    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+│ nom_fast_1p32V_m40C  │ 0.1223   │ 0.1223   │ 0.0000   │ 0        │ 0         │ 5.9355   │ 5.9355    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+│ nom_slow_1p08V_125C  │ 0.4157   │ 0.4157   │ 0.0000   │ 0        │ 0         │ 0.6111   │ 0.6111    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+│ nom_typ_1p20V_25C    │ 0.2636   │ 0.2636   │ 0.0000   │ 0        │ 0         │ 3.9581   │ 3.9581    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+└──────────────────────┴──────────┴──────────┴──────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┘
+```
+We not have a very comfortable +0.6ns slack on the worst corner closing at totally exesive clock frequency, 
+and we didn't even need to pull out LZA yet. 
+ 

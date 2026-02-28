@@ -40,6 +40,9 @@
  
   "SYNTH_AUTONAME":"True", 
   "SYNTH_HIERARCHY_MODE":"flatten", 
+
+  "RUN_POST_CTS_RESIZER_TIMING": "True", 
+  "RUN_POST_GRT_RESIZER_TIMING": "True",
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
   "//": "!!! DO NOT CHANGE ANYTHING BELOW THIS POINT !!!",
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
