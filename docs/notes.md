@@ -2,8 +2,11 @@
 
 ## Timing
 
-Given IHP 130nm is so fast, even if the max frequency on the output path is only 75MHz
-I decided to challenge myself to push the timing to 100MHz for the absurdity of it. 
+Given IHP 130nm is so fast, even if the max frequency on the output path is currently 
+believed to be around 75MHz.
+I decided to challenge myself to push the timing to 100MHz such that I can safely
+push the max frequency of the ASIC and learn more about the characteristics of the 
+GPIO output path. 
 
 Inside the `mac_unit` the multiplication and addition operations are performed on the 
 same cycle, so obviously the critical path is going to be on this path. 
@@ -312,8 +315,9 @@ existing logic and see what I can improve.
 #### Multiplier 
 
 Looking at this cirtical path, we can see that in the multiplier the propagation time is mainly occupied 
-by going though the multiplier. Given this booth multiplier is inffered by yosys and I don't fell like 
-writting a booth multiplier right away I will consider that as irreducible time. 
+by going though the multiplier. I higly doubt that a hand written booth radix 4 multiplier
+would performe substantially better than yosys's process aware synthesized multiplier, so 
+I am not considering the multiplier as an area on which I can save significant time. 
 
 We can note how, before reaching the booth multiplier I have a dependacy on the `b_nzero` net. This is 
 for determining the value of the hidden 1 to properly handle the case when one of the inputs is zero. 
@@ -324,8 +328,6 @@ subnormal rounding to zero. So I can start by removing this dependancy saving me
 -assign {ma, mb} = {{a_nzero, ma_i}, {b_nzero, mb_i}}; // hidden bit is 0 on 0.0
 +assign {ma, mb} = {{1'b1, ma_i}, {1'b1, mb_i}}; // zero case will be handled by zero masked on output
 ```
-
-(In reality, it made wns timing worst by -0.6ns and my tns by -39ns, that is going in the tool randomness bucket.)
 
 ### Adder 
 
@@ -360,6 +362,22 @@ go to zero and use this for masking.
 +assign mz_cp_norm = {M{~(xy_eq | ex_eq_zero_cnt |ez_cp_underflow) }} & mz_cp_norm_lite[M:1];// critical path through underflow
 ```
 
+#### Results 
+
+So close ...just a bit more  
+ 
+```
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┓
+┃                      ┃ Hold     ┃ Reg to   ┃          ┃          ┃ of which  ┃ Setup    ┃           ┃          ┃           ┃ of which ┃           ┃          ┃
+┃                      ┃ Worst    ┃ Reg      ┃          ┃ Hold Vio ┃ reg to    ┃ Worst    ┃ Reg to    ┃ Setup    ┃ Setup Vio ┃ reg to   ┃ Max Cap   ┃ Max Slew ┃
+┃ Corner/Group         ┃ Slack    ┃ Paths    ┃ Hold TNS ┃ Count    ┃ reg       ┃ Slack    ┃ Reg Paths ┃ TNS      ┃ Count     ┃ reg      ┃ Violatio… ┃ Violati… ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━┩
+│ Overall              │ 0.1139   │ 0.1139   │ 0.0000   │ 0        │ 0         │ -0.3224  │ -0.3224   │ -1.3166  │ 10        │ 10       │ 0         │ 0        │
+│ nom_fast_1p32V_m40C  │ 0.1139   │ 0.1139   │ 0.0000   │ 0        │ 0         │ 5.5460   │ 5.5460    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+│ nom_slow_1p08V_125C  │ 0.4157   │ 0.4157   │ 0.0000   │ 0        │ 0         │ -0.3224  │ -0.3224   │ -1.3166  │ 10        │ 10       │ 0         │ 0        │
+│ nom_typ_1p20V_25C    │ 0.2636   │ 0.2636   │ 0.0000   │ 0        │ 0         │ 3.3592   │ 3.3592    │ 0.0000   │ 0         │ 0        │ 0         │ 0        │
+└──────────────────────┴──────────┴──────────┴──────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┴───────────┴──────────┘
+```
 
 
 
