@@ -36,7 +36,10 @@
   "CLOCK_PORT": ["clk", "ui_in[0]"],
   "FALLBACK_SDC_FILE": "dir::project.sdc", 
 
-  "SYNTH_MUL_BOOTH": "True",  
+  "SYNTH_MUL_BOOTH": "True",
+ 
+  "SYNTH_AUTONAME":"True", 
+  "SYNTH_HIERARCHY_MODE":"flatten", 
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
   "//": "!!! DO NOT CHANGE ANYTHING BELOW THIS POINT !!!",
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",

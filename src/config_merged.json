@@ -11,6 +11,8 @@
   ],
   "FALLBACK_SDC_FILE": "dir::project.sdc",
   "SYNTH_MUL_BOOTH": "True",
+  "SYNTH_AUTONAME": "True",
+  "SYNTH_HIERARCHY_MODE": "flatten",
   "RUN_KLAYOUT_XOR": 0,
   "RUN_KLAYOUT_DRC": 0,
   "DESIGN_REPAIR_BUFFER_OUTPUT_PORTS": 0,
@@ -45,7 +47,5 @@
   "FP_DEF_TEMPLATE": "dir::../tt/tech/ihp-sg13g2/def/tt_block_2x2_pgvdd.def",
   "VDD_PIN": "VPWR",
   "GND_PIN": "VGND",
-  "RT_MAX_LAYER": "TopMetal1",
-  "SYNTH_AUTONAME": "True",
-  "SYNTH_HIERARCHY_MODE":"keep" 
+  "RT_MAX_LAYER": "TopMetal1"
 }
