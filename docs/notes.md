@@ -318,15 +318,30 @@ writting a booth multiplier right away I will consider that as irreducible time.
 We can note how, before reaching the booth multiplier I have a dependacy on the `b_nzero` net. This is 
 for determining the value of the hidden 1 to properly handle the case when one of the inputs is zero. 
 Exept ... I can also handle this after the mantissa multiplication, which I do as part of the 
-subnormal rounding to zero. So I can start by removing this dependancy saving me ~0,9ns. 
+subnormal rounding to zero. So I can start by removing this dependancy saving me up to ~,,9ns. 
 
 ```
 -assign {ma, mb} = {{a_nzero, ma_i}, {b_nzero, mb_i}}; // hidden bit is 0 on 0.0
 +assign {ma, mb} = {{1'b1, ma_i}, {1'b1, mb_i}}; // zero case will be handled by zero masked on output
 ```
 
+(In reality, it made wns timing worst by -0.6ns and my tns by -39ns, maybe this is just implementation run randomness and my -4.6ns run was actually really good ?)
+
 ### Adder 
 
 Now to tackle the adder where most of the propagation time is used up ~8.5ns, hopefully this should give me as 
 much opportunities for optimization. 
- 
+
+Going into the adder, the first critical path exits from the lsb of the exponent to the lsb of the shifted mantissa
+before the LZC. It looks like the path used to select the shift amount based on the difference
+between the two exponents. If the exponents are equal we don't shift, and if there difference is one we shift by one. 
+Looking I the code I was using the carry bit of both of the exponent comparisons to determine equality ... I can do better... 
+
+This will cost a bit more logic to do the comparison but we are not longer at the end 2 8 bit adders 
+and since we are checking for equality, we no longer care about the swapped exponent version.  
+```
+-assign exy_eq = ~eab_diff_carry & ~eba_diff_carry; // 1 = equal, 0 = not equal
++assign exy_eq = ea_i == eb_i; // 1 = equal, 0 = not equal, also don't care about swap if they are equal
+``` 
+
+
