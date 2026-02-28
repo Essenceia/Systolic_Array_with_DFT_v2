@@ -325,12 +325,14 @@ subnormal rounding to zero. So I can start by removing this dependancy saving me
 +assign {ma, mb} = {{1'b1, ma_i}, {1'b1, mb_i}}; // zero case will be handled by zero masked on output
 ```
 
-(In reality, it made wns timing worst by -0.6ns and my tns by -39ns, maybe this is just implementation run randomness and my -4.6ns run was actually really good ?)
+(In reality, it made wns timing worst by -0.6ns and my tns by -39ns, that is going in the tool randomness bucket.)
 
 ### Adder 
 
 Now to tackle the adder where most of the propagation time is used up ~8.5ns, hopefully this should give me as 
 much opportunities for optimization. 
+
+#### Close path: mantissa shifter 
 
 Going into the adder, the first critical path exits from the lsb of the exponent to the lsb of the shifted mantissa
 before the LZC. It looks like the path used to select the shift amount based on the difference
@@ -343,5 +345,21 @@ and since we are checking for equality, we no longer care about the swapped expo
 -assign exy_eq = ~eab_diff_carry & ~eba_diff_carry; // 1 = equal, 0 = not equal
 +assign exy_eq = ea_i == eb_i; // 1 = equal, 0 = not equal, also don't care about swap if they are equal
 ``` 
+
+#### Close path: Mantissa denormal to zero
+
+At the end of the worst path we also have the mantissa masking to zero on denormals. 
+The critical path passes though an or reduction of the normalized exponent that is used in the masking, 
+the strategy to fix this is going to be to pre-identify the conditions where the exponent would 
+go to zero and use this for masking. 
+
+```
+-assign mz_cp_norm = {M{~(exy_eq | ~|ez_cp_norm) }} & mz_cp_norm_lite[M:1];
++logic ex_eq_zero_cnt;
++assign ex_eq_zero_cnt = ~|ex[E-1:LZC_W] & (ex[LZC_W-1:0] == zero_cnt);
++assign mz_cp_norm = {M{~(xy_eq | ex_eq_zero_cnt |ez_cp_underflow) }} & mz_cp_norm_lite[M:1];// critical path through underflow
+```
+
+
 
 
