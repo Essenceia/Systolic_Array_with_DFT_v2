@@ -51,7 +51,7 @@ assign mv_gather_to_stream_next = res_rd_seq_v_i[2];
 always @(posedge clk) 
 	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
-assign {stream_idx_underflow, stream_idx_sub1} = stream_idx_next - {{IDX_W-1{1'b0}},1'd1};
+assign {stream_idx_underflow, stream_idx_sub1} = stream_idx_q - {{IDX_W-1{1'b0}},1'd1};
 assign stream_idx_next = stream_idx_underflow ? {IDX_W{1'd0}} : stream_idx_sub1;
 always @(posedge clk) begin 
 	if (mv_gather_to_stream_q) begin

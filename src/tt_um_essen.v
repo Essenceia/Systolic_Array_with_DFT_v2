@@ -31,7 +31,6 @@ assign     uio_out[5:0] = 6'b0;
 /* I/O interface, marked for boundary scan insertion */ 
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_v_bsc;
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [1:0]      data_mode_bsc; 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_rst_bsc; 
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [IO_W-1:0] data_bsc;
 (* MARK_BSC = "out", MARK_DEBUG = "true" *) wire            result_v_bsc;
 (* MARK_BSC = "out", MARK_DEBUG = "true" *) wire [IO_W-1:0] result_bsc;
@@ -50,8 +49,7 @@ wire            result_v;
 wire [IO_W-1:0] result;
 
 assign data_v_bsc    = uio_in[1];
-assign data_mode_bsc = uio_in[2];
-assign data_rst_bsc  = uio_in[3];
+assign data_mode_bsc = uio_in[3:2];
 assign data_bsc      = {uio_in[0], ui_in[7:1]};
 assign uio_out[7]    = result_v_bsc;
 assign uo_out        = result_bsc;

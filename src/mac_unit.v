@@ -8,7 +8,8 @@
 `default_nettype none 
 
 module mac_unit #(
-	parameter W = 8
+	parameter W = 8,
+	parameter IO_W = 8 // weight use IO_W for input and are shifted in
 	)(
 	input wire clk, 
 
@@ -17,8 +18,8 @@ module mac_unit #(
 	input wire [W-1:0]   data_i, //right side input data
 	input wire [W-1:0]   data_top_i, // top input data
 
-	input wire           wr_weight_v_i,	
-	input wire [W-1:0]   weight_i, 
+	input wire            wr_weight_v_i,	
+	input wire [IO_W-1:0] weight_i, 
 
 	input wire  [1:0]    jtag_ureg_addr_i, 
 	output logic [W-1:0] jtag_ureg_data_o, 
@@ -37,7 +38,7 @@ always @(posedge clk)
 	if (step_i) add_q <= data_top_i; // critical path end 
 
 always @(posedge clk) 
-	if (wr_weight_v_i) weight_q <= weight_i;
+	if (wr_weight_v_i) weight_q <= {weight_i, weight_q[W-1:IO_W]};
 
 // bfloat16 multiplication 
 bf16_mul m_mul(

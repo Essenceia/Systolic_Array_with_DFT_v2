@@ -16,8 +16,8 @@ module mac #(
 	input wire rst_n,
 	input wire ena,
 	
-	input wire         data_v_i,
-	input wire         data_mode_i,
+	input wire            data_v_i,
+	input wire [1:0]      data_mode_i,
 	input wire [IO_W-1:0] data_i, 
 
 	input wire  [UREG_ADDR-1:0] jtag_ureg_addr_i, 

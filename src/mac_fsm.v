@@ -36,7 +36,9 @@ module mac_fsm #(
 localparam MODE_DATA   = 2'd0;
 localparam MODE_WEIGHT = 2'd1;
 localparam MODE_RST    = 2'd2;
+/* verilator lint_off UNUSEDPARAM */
 localparam MODE_ASM    = 2'd3;
+/* verilator lint_on UNUSEDPARAM */
 
 localparam MAX_UNIT_IDX = NN;
 localparam UNIT_IDX_W   = $clog2(MAX_UNIT_IDX);  
@@ -58,11 +60,11 @@ always @(posedge clk)
 	else if (wr_weight_v) {wr_weight_idx_carry_unused, wr_weight_idx_q} <= wr_weight_idx_q + {{DATA_IDX_W-1{1'b0}}, 1'b1};
 
 always @(*) begin
-	case(wr_weight_idx_q[DATA_IDX_W-:UNIT_IDX_W])
-		2'd0: wr_weight_unit_v <= 4'b0001;
-		2'd1: wr_weight_unit_v <= 4'b0010;
-		2'd2: wr_weight_unit_v <= 4'b0100;
-		2'd3: wr_weight_unit_v <= 4'b1000;
+	case(wr_weight_idx_q[DATA_IDX_W-1-:UNIT_IDX_W])
+		2'd0: wr_weight_unit_v = 4'b0001;
+		2'd1: wr_weight_unit_v = 4'b0010;
+		2'd2: wr_weight_unit_v = 4'b0100;
+		2'd3: wr_weight_unit_v = 4'b1000;
 	endcase
 end
 
@@ -85,11 +87,11 @@ always @(posedge clk)
 	else if (wr_data_v) {wr_data_idx_carry_unused, wr_data_idx_q} <= wr_data_idx_q + {{DATA_IDX_W-1{1'b0}}, 1'b1};
 
 always @(*) begin
-	case(wr_data_idx_q[DATA_IDX_W-:UNIT_IDX_W])
-		2'd0: wr_data_row_v <= 2'b01;
-		2'd1: wr_data_row_v <= 2'b01;
-		2'd2: wr_data_row_v <= 2'b10;
-		2'd3: wr_data_row_v <= 2'b10;
+	case(wr_data_idx_q[DATA_IDX_W-1-:UNIT_IDX_W])
+		2'd0: wr_data_row_v = 2'b01;
+		2'd1: wr_data_row_v = 2'b01;
+		2'd2: wr_data_row_v = 2'b10;
+		2'd3: wr_data_row_v = 2'b10;
 	endcase
 end
 
