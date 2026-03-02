@@ -124,7 +124,7 @@ assign mac_step_o = mac_step_q;
 /* Streamout sequencer 
  * Data production depends on mac step though which in 
  * turn depends on data arrival */ 
-always @(clk) 
+always @(posedge clk) 
 	rd_res_seq_q <= rd_res_seq_d1_q;
 
 assign rd_res_seq_v_o = rd_res_seq_q; 
