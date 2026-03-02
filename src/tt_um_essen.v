@@ -12,7 +12,7 @@ module tt_um_essen(
     input  wire       rst_n     // reset_n - low to reset
 ); 
 
-localparam BSC_CHAIN_W = 7; // bsc scan chain length 
+localparam BSC_CHAIN_W = 6; // bsc scan chain length 
 localparam UREG_DATA_W = 16;
 localparam UREG_ADDR_W = 4;
 
@@ -30,7 +30,7 @@ assign     uio_out[5:0] = 6'b0;
 
 /* I/O interface, marked for boundary scan insertion */ 
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_v_bsc;
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_mode_bsc; 
+(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [1:0]      data_mode_bsc; 
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_rst_bsc; 
 (* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [IO_W-1:0] data_bsc;
 (* MARK_BSC = "out", MARK_DEBUG = "true" *) wire            result_v_bsc;
@@ -44,8 +44,7 @@ wire bsc_update;
 wire bsc_mode; 
 
 (* MARK_DEBUG = "true" *) wire       data_v;
-wire            data_mode; 
-wire            data_rst; 
+wire [1:0]      data_mode; 
 wire [IO_W-1:0] data;
 wire            result_v;
 wire [IO_W-1:0] result;
@@ -73,39 +72,31 @@ bsc #(.W(1)) m_bsc_data_v_in(
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);	
 
-bsc #(.W(1)) m_bsc_data_mode_in(
+bsc #(.W(2)) m_bsc_data_mode_in(
 	.tck(tck),
 	.data_i(data_mode_bsc), .data_o(data_mode),
 	.scan_i(bsc_chain[1]), .scan_o(bsc_chain[2]),
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);
 
-bsc #(.W(1)) m_bsc_data_rst_in(
-	.tck(tck),
-	.data_i(data_rst_bsc), .data_o(data_rst),
-	.scan_i(bsc_chain[2]), .scan_o(bsc_chain[3]),
-	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
-	);
-
-
 bsc #(.W(IO_W)) m_bsc_data_in(
 	.tck(tck),
 	.data_i(data_bsc), .data_o(data),
-	.scan_i(bsc_chain[3]), .scan_o(bsc_chain[4]),
+	.scan_i(bsc_chain[2]), .scan_o(bsc_chain[3]),
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);
 
 bsc #(.W(1)) m_bsc_result_v_out(
 	.tck(tck),
 	.data_i(result_v), .data_o(result_v_bsc),
-	.scan_i(bsc_chain[4]), .scan_o(bsc_chain[5]),
+	.scan_i(bsc_chain[3]), .scan_o(bsc_chain[4]),
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);
 
 bsc #(.W(IO_W)) m_bsc_result_out(
 	.tck(tck),
 	.data_i(result), .data_o(result_bsc),
-	.scan_i(bsc_chain[5]), .scan_o(bsc_chain[6]),
+	.scan_i(bsc_chain[4]), .scan_o(bsc_chain[5]),
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);
 
@@ -157,7 +148,6 @@ mac #(.W(W), .IO_W(IO_W), .N(2)) m_2x2_systolic_mac(
 
 	.data_v_i(data_v),
 	.data_mode_i(data_mode),
-	.data_rst_addr_i(data_rst),
 	.data_i(data), 
 
 	.jtag_ureg_addr_i(ureg_addr),

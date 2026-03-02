@@ -29,7 +29,7 @@ module mac_fsm #(
 
 	output wire mac_step_o, // cam step through 
 
-	output wire [OSER_W-1:0] rd_res_seq_v_o // streamout res sequence
+	output wire [OSEQ_W-1:0] rd_res_seq_v_o // streamout res sequence
 
 );
 /* data modes */
@@ -47,10 +47,10 @@ wire rst_addr;
 assign rst_addr = data_v_i & (data_mode_i == MODE_RST);
 
 /* weight write logic */
-wire               wr_weight_v;
-reg [DATA_IDX-1:0] wr_weight_idx_q;
-reg                wr_weight_idx_carry_unused;
-reg [NN-1:0]       wr_weight_unit_v;
+wire                 wr_weight_v;
+reg [DATA_IDX_W-1:0] wr_weight_idx_q;
+reg                  wr_weight_idx_carry_unused;
+reg [NN-1:0]         wr_weight_unit_v;
 
 assign wr_weight_v = data_v_i & (data_mode_i == MODE_WEIGHT);
 always @(posedge clk) 

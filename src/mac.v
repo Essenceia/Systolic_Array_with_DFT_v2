@@ -18,7 +18,6 @@ module mac #(
 	
 	input wire         data_v_i,
 	input wire         data_mode_i,
-	input wire         data_rst_addr_i,
 	input wire [IO_W-1:0] data_i, 
 
 	input wire  [UREG_ADDR-1:0] jtag_ureg_addr_i, 
@@ -38,21 +37,20 @@ reg   [W-1:0]  data_input_q[N-1:0];
 logic          mac_step; 
 logic [2:0]   rd_res_seq_v;
 
-mac_fsm #(.N(N), .NN(NN)) m_fsm(
+mac_fsm #(.IO_W(IO_W), .W(W)) m_fsm(
 	.clk(clk),
 	.rst_n(rst_n),
 	.ena(ena),
 
 	.data_v_i(data_v_i),
 	.data_mode_i(data_mode_i),
-	.data_rst_addr_i(data_rst_addr_i),
 
 	.wr_weight_v_o(wr_weight_v_flat),
 	.wr_data_v_o(wr_data_v),
 	
 	.mac_step_o(mac_step),
 
-	.rd_res_seq_v_o(rd_res_seq_v),
+	.rd_res_seq_v_o(rd_res_seq_v)
 );
 generate 
 	for(x=0; x<N; x=x+1) begin: g_wr_weight_v_x
