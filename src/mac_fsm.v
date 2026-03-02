@@ -32,7 +32,7 @@ module mac_fsm #(
 	output wire [N-1:0] res_wr_o // output streaming
 
 );
-/* data mode */
+/* data modes */
 localparam MODE_DATA   = 2'd0;
 localparam MODE_WEIGHT = 2'd1;
 localparam MODE_RST    = 2'd2;
@@ -97,7 +97,7 @@ assign wr_data_v_o = {N{wr_data_v}} & wr_data_row_v;
 
 /* N dimention dependant logic 
  *
- * MAC steps */
+ * MAC steps, depend on data arrival sequence */
 reg last_step_q;
 reg mac_step_q;
 reg en_q;
@@ -105,91 +105,21 @@ always @(posedge clk)
 	en_q <= ena;
 
 always @(posedge clk) 
-	if (~rst_n) last_step_q <= 1'b0;
-	else last_step_q <= wr_data_v & (wr_data_pos_q == 2'd3); 
+	last_step_q <= wr_data_v & en_q & (wr_data_idx_q == {2'd3, 1'b1}); 
 
-always @(posedge clk) 
-	if (en_q)  begin
-		mac_step_q <= wr_data_v & wr_data_pos_q != 2'd1 | last_step_q;
+always @(posedge clk) begin
+	if (en_q & wr_data_v)  begin
+		case(wr_data_idx_q) 
+			{2'd0,1'b1}:  mac_step_q <= 1'b1;// 0,0 
+			{2'd2,1'b1}:  mac_step_q <= 1'b1;//1,0 + 0,1
+			{2'd3,1'b1}:  mac_step_q <= 1'b1;//1,1 + last_step next cycle
+			default: mac_step_q <= last_step_q;
+		endcase
 	end
-
+end
 assign mac_step_o = mac_step_q;
 
-/* Capture MAC output control */ 
-reg [1:0] rd_fsm_q; 
-localparam RD_IDLE = 2'd0;
-localparam RD_0    = 2'd1; 
-localparam RD_1_2  = 2'd2; 
-localparam RD_3    = 2'd3;
-
-reg [N-1:0] res_rd_q;
-
-always @(posedge clk) begin
-	if (~rst_n | data_v_i & data_rst_addr_i) begin
-		rd_fsm_q <= RD_IDLE; 
-	end else begin
-		case(rd_fsm_q) 
-			RD_IDLE: rd_fsm_q <= wr_data_v & wr_data_pos_q == 2'b10 ? RD_0: RD_IDLE; 
-			RD_0: begin
-			   rd_fsm_q <= mac_step_q ? RD_1_2 : RD_0;
-			   res_rd_q <= {1'b0, mac_step_q};
-			end
-			RD_1_2: begin
-				rd_fsm_q <= mac_step_q ? RD_3: RD_1_2;
-				res_rd_q <= {mac_step_q, mac_step_q};
-			end
-			RD_3: begin
-				rd_fsm_q <= RD_IDLE;
-				res_rd_q <= {mac_step_q, 1'b0};
-			end
-		endcase
-	end
-end
-
-assign res_rd_o = res_rd_q; 
-
-/* stream captured output to IO */
-reg [N-1:0] res_wr_q;
-reg [2:0] wr_fsm_q; 
-localparam WR_IDLE = 3'd0;
-localparam WR_0    = 3'd1; 
-localparam WR_1    = 3'd2; 
-localparam WR_2    = 3'd3; 
-localparam WR_3    = 3'd4;
-
-always @(posedge clk) begin
-	if (~rst_n | data_v_i & data_rst_addr_i) begin
-		wr_fsm_q <= WR_IDLE; 
-	end else begin
-		case(wr_fsm_q) 
-			WR_IDLE: begin 
-				wr_fsm_q <= (rd_fsm_q == RD_0) ? WR_0: WR_IDLE; 
-				res_wr_q <= 2'b00;
-			end
-			WR_0: begin
-			   wr_fsm_q <= (rd_fsm_q == RD_1_2) & mac_step_q ? WR_1 : WR_0;
-			   res_wr_q <= res_rd_q; // 2'b01
-			end
-			WR_1: begin
-				wr_fsm_q <= (rd_fsm_q == RD_3) & mac_step_q ? WR_2: WR_1;
-				res_wr_q <= {mac_step_q , 1'b0};
-			end
-			WR_2: begin
-				wr_fsm_q <= WR_3;
-				res_wr_q <= 2'b01;
-			end			
-			WR_3: begin
-				wr_fsm_q <= WR_IDLE;
-				res_wr_q <= 2'b10;
-			end
-			default: begin 
-				wr_fsm_q <= WR_IDLE;
-				res_wr_q <= 2'b00;
-			end
-		endcase
-	end
-end
-
-assign res_wr_o = res_wr_q; 
+/* Streamout sequencer 
+ * Depends on data arrival + mac step though */ 
 
 endmodule
