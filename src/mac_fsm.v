@@ -9,16 +9,17 @@
 `timescale 1ns / 1ps
 
 module mac_fsm #(
-	parameter N = 2,
-	parameter NN = N*N
+	parameter IO_W = 8,
+	parameter W = 16,
+	localparam N = 2,
+	localparam NN = N*N
 )(
 	input wire clk, 
 	input wire rst_n, 
 	input wire ena,
 
-	input wire data_v_i, 
-	input wire data_mode_i, 
-	input wire data_rst_addr_i,
+	input wire       data_v_i, 
+	input wire [1:0] data_mode_i, 
 
 	output wire [NN-1:0] wr_weight_v_o,
 	output wire [N-1:0]  wr_data_v_o,
@@ -29,29 +30,45 @@ module mac_fsm #(
 	output wire [N-1:0] res_wr_o // output streaming
 
 );
-localparam MODE_DATA   = 1'b0;
-localparam MODE_WEIGHT = 1'b1;
+/* data mode */
+localparam MODE_DATA   = 2'd0;
+localparam MODE_WEIGHT = 2'd1;
+localparam MODE_RST    = 2'd2;
+localparam MODE_ASM    = 2'd3;
+
+localparam MAX_UNIT_IDX = NN;
+localparam UNIT_IDX_W   = $clog2(MAX_UNIT_IDX);  
+localparam DATA_IDX_W   = $clog2(MAX_UNIT_IDX*(W/IO_W));
+
+/* rst all write addr */
+wire rst_addr; 
+assign rst_addr = data_v_i & (data_mode_i == MODE_RST);
 
 /* weight write logic */
 wire wr_weight_v;
 reg [NN-1:0] wr_weight_pos_q;
 
-assign wr_weight_v = data_v_i & (data_mode_i == MODE_WEIGHT) & ~data_rst_addr_i;
+assign wr_weight_v = data_v_i & (data_mode_i == MODE_WEIGHT);
 always @(posedge clk) 
-	if (~rst_n |  data_rst_addr_i ) wr_weight_pos_q <= {{NN-1{1'b0}}, 1'b1};
+	if (~rst_n |  rst_addr ) wr_weight_pos_q <= {{NN-1{1'b0}}, 1'b1};
 	else if (wr_weight_v) wr_weight_pos_q <= { wr_weight_pos_q[NN-2:0], wr_weight_pos_q[NN-1]};
 
 assign wr_weight_v_o = {NN{wr_weight_v}} & wr_weight_pos_q;
 
-/* data write logic */
-wire        wr_data_v;
-reg [N-1:0] wr_data_pos_q;
-reg         unused_add_q;
+/* data write logic
+ * Capture incoming data over 8 bit wide bus and feed it to the
+ * systolic array. */
+wire [N-1:0]          wr_data_v;
+reg  [DATA_IDX_W-1:0] wr_data_idx_q;
+reg                   wr_data_idx_carry_unused;
 
-assign wr_data_v = data_v_i & (data_mode_i == MODE_DATA) & ~data_rst_addr_i;
+assign wr_data_v = data_v_i & (data_mode_i == MODE_DATA);
+
 always @(posedge clk) 
-	if (~rst_n | data_rst_addr_i ) wr_data_pos_q <= {N{1'b0}};
-	else if (wr_data_v) {unused_add_q, wr_data_pos_q} <= wr_data_pos_q + {{N-1{1'b0}}, 1'b1};
+	if (~rst_n | rst_addr ) wr_data_idx_q <= {DATA_IDX_W{1'b0}};
+	else if (wr_data_v) {wr_data_idx_carry_unused, wr_data_idx_q} <= wr_data_idx_q + {{DATA_IDX_W{1'b0}}, 1'b1};
+
+assign wr_data_v_o = { wr_data_pos_q[0], ~wr_data_pos_q[0]};
 
 /* N dimention dependant logic 
  *
@@ -62,7 +79,6 @@ reg en_q;
 always @(posedge clk) 
 	en_q <= ena;
 
-assign wr_data_v_o = { wr_data_pos_q[0], ~wr_data_pos_q[0]};
 always @(posedge clk) 
 	if (~rst_n) last_step_q <= 1'b0;
 	else last_step_q <= wr_data_v & (wr_data_pos_q == 2'd3); 

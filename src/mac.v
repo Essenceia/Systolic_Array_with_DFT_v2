@@ -66,9 +66,8 @@ endgenerate
 /* Steamin data */ 
 mac_steamin #(.IN_W(IO_W), .W(W)) m_mac_data_steamin_2x2(
 	.clk(clk),
-	.data_valid_i(data_v_i),
 	.data_i(data_i),
-	.data_idx_onehote_i(wr_data_v),
+	.data_idx_onehote0_i(wr_data_v),
 	.data_o(data_input_q)
 );
 
