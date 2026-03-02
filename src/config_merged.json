@@ -40,6 +40,8 @@
     "dir::ir.v",
     "dir::mac.v",
     "dir::mac_unit.v",
+    "dir::mac_streamin.v",
+    "dir::mac_streamout.v",
     "dir::bf16/src/bf16_add.v",
     "dir::bf16/src/bf16_mul.v",
     "dir::bf16/src/booth_unsigned_mul.v",

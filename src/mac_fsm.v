@@ -127,5 +127,5 @@ assign mac_step_o = mac_step_q;
 always @(clk) 
 	rd_res_seq_q <= rd_res_seq_d1_q;
 
-assign rd_res_seq_o = rd_res_seq_q; 
+assign rd_res_seq_v_o = rd_res_seq_q; 
 endmodule

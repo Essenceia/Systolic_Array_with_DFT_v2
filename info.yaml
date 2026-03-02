@@ -23,6 +23,8 @@ project:
     - "ir.v"
     - "mac.v"
     - "mac_unit.v"
+    - "mac_streamin.v"
+    - "mac_streamout.v"
     - "bf16/src/bf16_add.v"
     - "bf16/src/bf16_mul.v"
     - "bf16/src/booth_unsigned_mul.v"
