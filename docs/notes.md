@@ -412,4 +412,207 @@ And voila:
 ```
 We not have a very comfortable +0.6ns slack on the worst corner closing at totally exesive clock frequency, 
 and we didn't even need to pull out LZA yet. 
- 
+
+### Yosys wins
+
+The critical path on the adder close path goes though the LZC logic and I currently have an, if I dare say so "complex" 
+tree based LZC strucutre. Following an online conversation I was encouraged to give a priority mux a shot : 
+```verilog
+always @(*) begin
+        casez (in)
+            9'b1????????: shift_amt = 4'd0;
+            9'b01???????: shift_amt = 4'd1;
+            9'b001??????: shift_amt = 4'd2;
+            9'b0001?????: shift_amt = 4'd3;
+            9'b00001????: shift_amt = 4'd4;
+            9'b000001???: shift_amt = 4'd5;
+            9'b0000001??: shift_amt = 4'd6;
+            9'b00000001?: shift_amt = 4'd7;
+            9'b000000001: shift_amt = 4'd8;
+            default:      shift_amt = 4'd0;
+        endcase
+    end
+```
+
+In all transparency, I did NOT think this would result in better timing than the tree based LZC. 
+Yet, between the RTL and timing there is yosys, 124 levels of optimization, and yosys is techmap aware. 
+
+For reference, this is the original module's code, isolated into it's own module so that I can keep track of it when 
+keeping the hierarchy during implementation : 
+```
+module pmux(
+        input wire [8:0] data_i,
+        output reg [3:0] zero_cnt
+);
+
+always @(*) begin
+        casez (data_i)
+            9'b1????????: zero_cnt = 4'd0;
+            9'b01???????: zero_cnt = 4'd1;
+            9'b001??????: zero_cnt = 4'd2;
+            9'b0001?????: zero_cnt = 4'd3;
+            9'b00001????: zero_cnt = 4'd4;
+            9'b000001???: zero_cnt = 4'd5;
+            9'b0000001??: zero_cnt = 4'd6;
+            9'b00000001?: zero_cnt = 4'd7;
+            9'b000000001: zero_cnt = 4'd8;
+            default:      zero_cnt = 4'd0;
+        endcase
+end
+endmodule
+```
+
+And this is what Yosys has transformed the priority mux into : 
+```verilog 
+module pmux(data_i, zero_cnt);
+  input [8:0] data_i;
+  wire [8:0] data_i;
+  output [3:0] zero_cnt;
+  wire [3:0] zero_cnt;
+  wire zero_cnt_sg13g2_a21oi_1_Y_A2;
+  wire zero_cnt_sg13g2_and4_1_X_B;
+  wire zero_cnt_sg13g2_and4_1_X_C;
+  wire zero_cnt_sg13g2_and4_1_X_D;
+  wire zero_cnt_sg13g2_nor3_1_Y_C;
+  wire zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A1;
+  wire zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A2;
+  wire zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_B2;
+  wire zero_cnt_sg13g2_o21ai_1_Y_A1;
+  wire zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X_C;
+  wire zero_cnt_sg13g2_o21ai_1_Y_A2;
+  wire zero_cnt_sg13g2_o21ai_1_Y_A2_sg13g2_o21ai_1_Y_B1;
+  wire zero_cnt_sg13g2_o21ai_1_Y_B1;
+  wire zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_A2;
+  wire zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_B1;
+  sg13g2_a21oi_1 zero_cnt_sg13g2_a21oi_1_Y (
+    .A1(zero_cnt_sg13g2_o21ai_1_Y_A2),
+    .A2(zero_cnt_sg13g2_a21oi_1_Y_A2),
+    .B1(zero_cnt_sg13g2_o21ai_1_Y_A1),
+    .Y(zero_cnt[2])
+  );
+  sg13g2_a21oi_1 zero_cnt_sg13g2_a21oi_1_Y_A2_sg13g2_a21oi_1_Y (
+    .A1(zero_cnt_sg13g2_and4_1_X_B),
+    .A2(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_B2),
+    .B1(data_i[4]),
+    .Y(zero_cnt_sg13g2_a21oi_1_Y_A2)
+  );
+  sg13g2_and4_1 zero_cnt_sg13g2_and4_1_X (
+    .A(data_i[0]),
+    .B(zero_cnt_sg13g2_and4_1_X_B),
+    .C(zero_cnt_sg13g2_and4_1_X_C),
+    .D(zero_cnt_sg13g2_and4_1_X_D),
+    .X(zero_cnt[3])
+  );
+  sg13g2_nor2_1 zero_cnt_sg13g2_and4_1_X_B_sg13g2_nor2_1_Y (
+    .A(data_i[4]),
+    .B(data_i[5]),
+    .Y(zero_cnt_sg13g2_and4_1_X_B)
+  );
+  sg13g2_nor2_1 zero_cnt_sg13g2_and4_1_X_C_sg13g2_nor2_1_Y (
+    .A(data_i[3]),
+    .B(data_i[6]),
+    .Y(zero_cnt_sg13g2_and4_1_X_C)
+  );
+  sg13g2_nor4_1 zero_cnt_sg13g2_and4_1_X_D_sg13g2_nor4_1_Y (
+    .A(data_i[1]),
+    .B(data_i[2]),
+    .C(data_i[8]),
+    .D(data_i[7]),
+    .Y(zero_cnt_sg13g2_and4_1_X_D)
+  );
+  sg13g2_nor3_1 zero_cnt_sg13g2_nor3_1_Y (
+    .A(data_i[8]),
+    .B(data_i[7]),
+    .C(zero_cnt_sg13g2_nor3_1_Y_C),
+    .Y(zero_cnt[1])
+  );
+  sg13g2_a221oi_1 zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y (
+    .A1(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A1),
+    .A2(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A2),
+    .B1(zero_cnt_sg13g2_and4_1_X_B),
+    .B2(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_B2),
+    .C1(zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X_C),
+    .Y(zero_cnt_sg13g2_nor3_1_Y_C)
+  );
+  sg13g2_nor2b_1 zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A1_sg13g2_nor2b_1_Y (
+    .A(data_i[2]),
+    .B_N(data_i[1]),
+    .Y(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A1)
+  );
+  sg13g2_nor2_1 zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A2_sg13g2_nor2_1_Y (
+    .A(data_i[3]),
+    .B(data_i[4]),
+    .Y(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A2)
+  );
+  sg13g2_nor2b_1 zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_B2_sg13g2_nor2b_1_Y (
+    .A(data_i[3]),
+    .B_N(data_i[2]),
+    .Y(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_B2)
+  );
+  sg13g2_o21ai_1 zero_cnt_sg13g2_o21ai_1_Y (
+    .A1(zero_cnt_sg13g2_o21ai_1_Y_A1),
+    .A2(zero_cnt_sg13g2_o21ai_1_Y_A2),
+    .B1(zero_cnt_sg13g2_o21ai_1_Y_B1),
+    .Y(zero_cnt[0])
+  );
+  sg13g2_or3_1 zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X (
+    .A(data_i[8]),
+    .B(data_i[7]),
+    .C(zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X_C),
+    .X(zero_cnt_sg13g2_o21ai_1_Y_A1)
+  );
+  sg13g2_or2_1 zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X_C_sg13g2_or2_1_X (
+    .A(data_i[5]),
+    .B(data_i[6]),
+    .X(zero_cnt_sg13g2_o21ai_1_Y_A1_sg13g2_or3_1_X_C)
+  );
+  sg13g2_o21ai_1 zero_cnt_sg13g2_o21ai_1_Y_A2_sg13g2_o21ai_1_Y (
+    .A1(data_i[3]),
+    .A2(zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y_A1),
+    .B1(zero_cnt_sg13g2_o21ai_1_Y_A2_sg13g2_o21ai_1_Y_B1),
+    .Y(zero_cnt_sg13g2_o21ai_1_Y_A2)
+  );
+  sg13g2_inv_1 zero_cnt_sg13g2_o21ai_1_Y_A2_sg13g2_o21ai_1_Y_B1_sg13g2_inv_1_Y (
+    .A(data_i[4]),
+    .Y(zero_cnt_sg13g2_o21ai_1_Y_A2_sg13g2_o21ai_1_Y_B1)
+  );
+  sg13g2_o21ai_1 zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y (
+    .A1(data_i[7]),
+    .A2(zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_A2),
+    .B1(zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_B1),
+    .Y(zero_cnt_sg13g2_o21ai_1_Y_B1)
+  );
+  sg13g2_nor2b_1 zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_A2_sg13g2_nor2b_1_Y (
+    .A(data_i[6]),
+    .B_N(data_i[5]),
+    .Y(zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_A2)
+  );
+  sg13g2_inv_1 zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_B1_sg13g2_inv_1_Y (
+    .A(data_i[8]),
+    .Y(zero_cnt_sg13g2_o21ai_1_Y_B1_sg13g2_o21ai_1_Y_B1)
+  );
+endmodule
+```
+
+This 19 cell result comes out to only **3** logic levels deep on the critical path, resulting in better timing:
+```
+                      0.082694    0.000868   10.346982 v m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_and4_1_X_B_sg13g2_nor2_1_Y/B (sg13g2_nor2_2)
+     2    0.008899    0.088466    0.106549   10.453530 ^ m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_and4_1_X_B_sg13g2_nor2_1_Y/Y (sg13g2_nor2_2)
+                                                         m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_and4_1_X_B (net)
+                      0.088468    0.000483   10.454014 ^ m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y/B1 (sg13g2_a221oi_1)
+     1    0.006730    0.141179    0.143724   10.597738 v m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_nor3_1_Y_C_sg13g2_a221oi_1_Y/Y (sg13g2_a221oi_1)
+                                                         m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_nor3_1_Y_C (net)
+                      0.141179    0.000282   10.598020 v m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_nor3_1_Y/C (sg13g2_nor3_2)
+     2    0.020858    0.262551    0.251656   10.849676 ^ m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx/zero_cnt_sg13g2_nor3_1_Y/Y (sg13g2_nor3_2)
+                                                         m_2x2_systolic_mac/g_unit_x[1].g_unit_y[1].m_unit/m_add/m_pmux_idx_zero_cnt_2 (net)
+```
+
+On the final flattened version this results in a `+0.05` ns improvement on the slow path. 
+On one hand, this isn't a huge gain, but this experience forces to recognise how performant the tools can be. 
+This `casez` LZC design is not only faster, it is simpler to understand, will be easier to maintain, reducing the likelyhood of 
+bugs being introduced in the future. 
+
+So the tree based LZC is currently getting replaced for $p = 8$. 
+
+
+
