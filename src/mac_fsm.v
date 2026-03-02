@@ -120,6 +120,7 @@ end
 assign mac_step_o = mac_step_q;
 
 /* Streamout sequencer 
- * Depends on data arrival + mac step though */ 
+ * Data production depends on mac step though which in 
+ * turn depends on data arrival */ 
 
 endmodule
