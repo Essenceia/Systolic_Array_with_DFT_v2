@@ -15,7 +15,7 @@ module mac_streamout #(
 
 	// result from systolic array 
 	input wire [N-1:0]     res_valid_i,
-	input wire [2:0]       res_idx_i,
+	input wire [2:0]       res_idx_onehot_i,
 	input wire [N*W-1:0]   res_data_i,
 
 	// output IO interface
@@ -29,11 +29,11 @@ reg [W-1:0] gather_q[NN];
 
 always @(posedge clk) begin
 	if(res_valid_i) begin
-		if(res_idx_i[0])
+		if(res_idx_onehot_i[0])
 			gather_q[0] <= res_data_i[W-1:0]; 
-		if (res_idx_i[1])
+		if (res_idx_onehot_i[1])
 			{gather_q[1], gather_q[2]} <= res_data_i;
-		if (res_idx_i[2])
+		if (res_idx_onehot_i[2])
 			gather_q[3] <= res_data_i[N*W-1:W]; 
 	end
 end
@@ -46,7 +46,7 @@ reg             mv_gather_to_stream_q;
 reg  [NN-1:0]    stream_valid_q;
 wire [NN-1:0]    stream_valid_next;
 
-assign mv_gather_to_stream_next = res_idx_i[2] & res_valid_i; 
+assign mv_gather_to_stream_next = res_idx_onehot_i[2] & res_valid_i; 
 always @(posedge clk) 
 	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
