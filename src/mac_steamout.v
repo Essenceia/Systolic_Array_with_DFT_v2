@@ -24,7 +24,6 @@ module mac_streamout #(
 
 );
 localparam NN = N*N;
-localparam IDX_W = $clog2(2*2)
 
 reg [W-1:0] gather_q[NN];
 
@@ -42,16 +41,39 @@ end
 // streamout result
 reg [W-1:0] stream_q[NN];
 
-wire            start_stream_next; 
-reg             stream_valid_q;
-reg [IDX_W-1:0] stream_idx_q; 
+wire            mv_gather_to_stream_next;
+reg             mv_gather_to_stream_q;
+reg  [NN-1:0]    stream_valid_q;
+wire [NN-1:0]    stream_valid_next;
 
-assign start_stream_next = res_idx_i[2] & res_valid_i; 
+assign mv_gather_to_stream_next = res_idx_i[2] & res_valid_i; 
+always @(posedge clk) 
+	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
-// TODO 
+assign stream_valid_next = {1'b0, stream_valid_q[(NN-1)-1-:1];
+always @(posedge clk) begin 
+	if (mv_gather_to_stream_q) begin
+		stream_q <= gather_q;
+		stream_valid_q <= {NN{1'b1}};
+	end else begin
+		stream_q <= {8'b0, stream_q[(NN-1)*W-1-:W]};
+		stream_valid_q <= stream_valid_next;
+	end
+end
+
+// TODO: reduce output switching freq / 2 ? 
+
+// add extra ff layer to help improve increase positive
+// slack on output valid path, need as much as we can if we
+// want to push output GPIO Fmax
+reg         out_valid_q; 
+always @(posedge clk) begin
+	if (~rst_n) out_valid_q <= 1'b0; 
+	else output_valid_q <= mv_gather_to_stream_q | |stream_valid_next; // valid is asserted a cycle before data start being sent 
+end
 
 // output 
-assign valid_o = start_stream_next | stream_valid_q;
-assign data_o  = stream_q[W-1:0]; 
+assign valid_o = out_valid_q;
+assign data_o  = stream_valid_q[W-1:0]; 
 
 endmodule
