@@ -16,6 +16,10 @@ localparam BSC_CHAIN_W = 7; // bsc scan chain length
 localparam UREG_DATA_W = 16;
 localparam UREG_ADDR_W = 4;
 
+localparam IO_W = 8; // IO data interface width 
+localparam W    = 16;// base type, using bfloat16
+
+
 /* IO direction, 0: input, 1: output */
 assign uio_oe = 8'b1100_0000; 
 
@@ -25,12 +29,12 @@ assign     unused_input = uio_in[7:6];
 assign     uio_out[5:0] = 6'b0;  
 
 /* I/O interface, marked for boundary scan insertion */ 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire       data_v_bsc;
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire       data_mode_bsc; 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire       data_rst_bsc; 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [7:0] data_bsc;
-(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire       result_v_bsc;
-(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire [7:0] result_bsc;
+(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_v_bsc;
+(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_mode_bsc; 
+(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_rst_bsc; 
+(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [IO_W-1:0] data_bsc;
+(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire            result_v_bsc;
+(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire [IO_W-1:0] result_bsc;
 
 wire [BSC_CHAIN_W-1:0] bsc_chain;
 wire bsc_tdo;
@@ -40,13 +44,11 @@ wire bsc_update;
 wire bsc_mode; 
 
 (* MARK_DEBUG = "true" *) wire       data_v;
-wire       data_mode; 
-wire       data_rst; 
-wire [7:0] data;
-wire       result_v;
-(* keep = "true" *) 
-wire [7:0] result_unused; // TODO proper result streaming
-wire [7:0] result;
+wire            data_mode; 
+wire            data_rst; 
+wire [IO_W-1:0] data;
+wire            result_v;
+wire [IO_W-1:0] result;
 
 assign data_v_bsc    = uio_in[1];
 assign data_mode_bsc = uio_in[2];
@@ -86,7 +88,7 @@ bsc #(.W(1)) m_bsc_data_rst_in(
 	);
 
 
-bsc #(.W(8)) m_bsc_data_in(
+bsc #(.W(IO_W)) m_bsc_data_in(
 	.tck(tck),
 	.data_i(data_bsc), .data_o(data),
 	.scan_i(bsc_chain[3]), .scan_o(bsc_chain[4]),
@@ -100,7 +102,7 @@ bsc #(.W(1)) m_bsc_result_v_out(
 	.shift_i(bsc_shift), .capture_i(bsc_capture), .update_i(bsc_update), .mode_i(bsc_mode)
 	);
 
-bsc #(.W(8)) m_bsc_result_out(
+bsc #(.W(IO_W)) m_bsc_result_out(
 	.tck(tck),
 	.data_i(result), .data_o(result_bsc),
 	.scan_i(bsc_chain[5]), .scan_o(bsc_chain[6]),
@@ -148,7 +150,7 @@ jtag #(.IR_W(3),
 );
 
 // MAC design
-mac #(.W(16), .N(2)) m_2x2_systolic_mac(
+mac #(.W(W), .IO_W(IO_W), .N(2)) m_2x2_systolic_mac(
 	.clk(clk),
 	.rst_n(rst_n), 
 	.ena(ena),
@@ -156,13 +158,13 @@ mac #(.W(16), .N(2)) m_2x2_systolic_mac(
 	.data_v_i(data_v),
 	.data_mode_i(data_mode),
 	.data_rst_addr_i(data_rst),
-	.data_i({data, 8'h00}), // TODO correctly rework data accumulation in mac
+	.data_i(data), 
 
 	.jtag_ureg_addr_i(ureg_addr),
 	.jtag_ureg_data_o(ureg_data),
 
 	.result_v_o(result_v),
-	.result_o({result_unused, result})
+	.result_o(result)
 );
 
 endmodule
