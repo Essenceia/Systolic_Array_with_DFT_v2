@@ -2,8 +2,10 @@
  * Multiply accumulate systolic array top of size NxN FSM
  * 
  * Orchastrates the MAC behavior
+ *
+ * This code will be simplified by synth, maximizing readability
  * 
- * Julia Desmazes, 2025, this code is human made
+ * Julia Desmazes, 2026, this code is human made
  */
 
 `timescale 1ns / 1ps
@@ -45,15 +47,26 @@ wire rst_addr;
 assign rst_addr = data_v_i & (data_mode_i == MODE_RST);
 
 /* weight write logic */
-wire wr_weight_v;
-reg [NN-1:0] wr_weight_pos_q;
+wire               wr_weight_v;
+reg [DATA_IDX-1:0] wr_weight_idx_q;
+reg                wr_weight_idx_carry_unused;
+reg [NN-1:0]       wr_weight_unit_v;
 
 assign wr_weight_v = data_v_i & (data_mode_i == MODE_WEIGHT);
 always @(posedge clk) 
-	if (~rst_n |  rst_addr ) wr_weight_pos_q <= {{NN-1{1'b0}}, 1'b1};
-	else if (wr_weight_v) wr_weight_pos_q <= { wr_weight_pos_q[NN-2:0], wr_weight_pos_q[NN-1]};
+	if (~rst_n |  rst_addr ) wr_weight_idx_q <= {DATA_IDX_W{1'b0}};
+	else if (wr_weight_v) {wr_weight_idx_carry_unused, wr_weight_idx_q} <= wr_weight_idx_q + {{DATA_IDX_W-1{1'b0}}, 1'b1};
 
-assign wr_weight_v_o = {NN{wr_weight_v}} & wr_weight_pos_q;
+always @(*) begin
+	case(wr_weight_idx_q[DATA_IDX_W-:UNIT_IDX_W])
+		2'd0: wr_weight_unit_v <= 4'b0001;
+		2'd1: wr_weight_unit_v <= 4'b0010;
+		2'd2: wr_weight_unit_v <= 4'b0100;
+		2'd3: wr_weight_unit_v <= 4'b1000;
+	endcase
+end
+
+assign wr_weight_v_o = {NN{wr_weight_v}} & wr_weight_unit_v;
 
 /* data write logic
  *
@@ -63,25 +76,24 @@ assign wr_weight_v_o = {NN{wr_weight_v}} & wr_weight_pos_q;
 wire                  wr_data_v;
 reg  [DATA_IDX_W-1:0] wr_data_idx_q;
 reg                   wr_data_idx_carry_unused;
-reg  [N-1:0]          wr_data_row_idx;
+reg  [N-1:0]          wr_data_row_v;
 
 assign wr_data_v = data_v_i & (data_mode_i == MODE_DATA);
 
 always @(posedge clk) 
 	if (~rst_n | rst_addr ) wr_data_idx_q <= {DATA_IDX_W{1'b0}};
-	else if (wr_data_v) {wr_data_idx_carry_unused, wr_data_idx_q} <= wr_data_idx_q + {{DATA_IDX_W{1'b0}}, 1'b1};
+	else if (wr_data_v) {wr_data_idx_carry_unused, wr_data_idx_q} <= wr_data_idx_q + {{DATA_IDX_W-1{1'b0}}, 1'b1};
 
-// this code will be simplified by synth, maximizing readability
 always @(*) begin
 	case(wr_data_idx_q[DATA_IDX_W-:UNIT_IDX_W])
-		2'd0: wr_data_row_idx <= 2'b01;
-		2'd1: wr_data_row_idx <= 2'b01;
-		2'd2: wr_data_row_idx <= 2'b10;
-		2'd3: wr_data_row_idx <= 2'b10;
+		2'd0: wr_data_row_v <= 2'b01;
+		2'd1: wr_data_row_v <= 2'b01;
+		2'd2: wr_data_row_v <= 2'b10;
+		2'd3: wr_data_row_v <= 2'b10;
 	endcase
 end
 
-assign wr_data_v_o = {N{wr_data_v}} & wr_data_row_idx;
+assign wr_data_v_o = {N{wr_data_v}} & wr_data_row_v;
 
 /* N dimention dependant logic 
  *
