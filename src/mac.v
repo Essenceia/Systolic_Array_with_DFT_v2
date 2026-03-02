@@ -33,7 +33,7 @@ genvar x,y;
 logic [NN-1:0] wr_weight_v_flat; // limited support for multidimentional array in the simulator 
 logic          wr_weight_v[N-1:0][N-1:0];
 logic [N-1:0]  wr_data_v;
-reg   [W-1:0]  data_input_q[N-1:0];
+reg   [N*W-1:0] data_input_q;
 logic          mac_step; 
 logic [2:0]   rd_res_seq_v;
 
@@ -61,7 +61,7 @@ generate
 endgenerate
 
 /* Steamin data */ 
-mac_steamin #(.IN_W(IO_W), .W(W)) m_mac_data_steamin_2x2(
+mac_streamin #(.IN_W(IO_W), .W(W)) m_mac_data_steamin_2x2(
 	.clk(clk),
 	.data_i(data_i),
 	.data_wr_v_i(wr_data_v),
@@ -79,7 +79,7 @@ logic [W-1:0] jtag_ureg_data[NN-1:0];
 
 generate 
 	for(y=0; y<N; y=y+1) begin: g_data_unit
-		assign data_unit[0][y] = data_input_q[y];
+		assign data_unit[0][y] = data_input_q[y*W+:W];
 		for(x=1; x<N; x=x+1) begin: g_data_unit_flow
 			assign data_unit[x][y] = data_flow_right[x-1][y];
 		end
