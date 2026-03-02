@@ -20,7 +20,7 @@ module mac_streamin #(
 );
 reg [N*W-1:0] buf_q;
 
-// would rather have a pre-compiler to generate this code
+// would rather have a recursive macro engine to generate this code
 always @(posedge clk) begin
 	if (data_valid_i & data_idx_onehot_i[0])
 		buf_q[W-1:0] <= {data_i, buf_q[W-1:IN_W]};

@@ -60,11 +60,16 @@ generate
 			assign wr_weight_v[x][y] = wr_weight_v_flat[y*N+x];
 		end
 	end
-	for(y=0; y<N; y=y+1) begin: g_wr_data_y
-		always @(posedge clk) 
-			if (wr_data_v[y])data_input_q[y] <= data_i;
-	end
 endgenerate
+
+/* Steamin data */ 
+mac_steamin #(.IN_W(IN_W), .W(W)) m_mac_data_steamin_2x2(
+	.clk(clk),
+	.data_valid_i(data_v_i),
+	.data_i(data_i),
+	.data_idx_onehote_i(wr_data_v),
+	.data_o(data_input_q)
+);
 
 /* Systolic array */ 
 
@@ -119,22 +124,14 @@ assign debug_res1 = res_unit[1][0];
 assign debug_res2 = res_unit[0][N-1]; 
 assign debug_res3 = res_unit[1][N-1];
 
-// capturing result for streamout
-reg [W-1:0] res_stream_q[N-1:0];
-
-// given the res is the critical path, we can't bypass this flop
-generate 
-	for (x=0; x<N; x=x+1) begin: g_res_capture
-		always @(posedge clk) 
-			if (res_rd[x])res_stream_q[x] <= res_unit[x][N-1];
-	end
-endgenerate
-
-
-// Result output
-assign result_v_o = |res_wr;
-assign result_o = res_wr[1] ? res_stream_q[1]: res_stream_q[0];
-
+/* result streamout */
+mac_streamout #(.W(W)) m_mac_result_streamout_2x2(
+	.clk(clk),
+	.res_idx_onehot0_i(res_rd),
+	.res_data_i({res_unit[1][N-1], res_unit[0][N-1]}),
+	.valid_o(result_v_o),
+	.data_o(result_o)
+);
 
 // JTAG user register access
 assign jtag_ureg_data_o = jtag_ureg_data[jtag_ureg_addr_i[3:2]]; 

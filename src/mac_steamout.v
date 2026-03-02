@@ -11,11 +11,9 @@ module mac_streamout #(
 	localparam N = 2 // currently designed for a 2x2 array
 )(
 	input wire clk, 
-	input wire rst_n, 
 
 	// result from systolic array 
-	input wire [N-1:0]     res_valid_i,
-	input wire [2:0]       res_idx_onehot_i,
+	input wire [2:0]       res_idx_onehot0_i,
 	input wire [N*W-1:0]   res_data_i,
 
 	// output IO interface
@@ -28,14 +26,12 @@ localparam NN = N*N;
 reg [W-1:0] gather_q[NN];
 
 always @(posedge clk) begin
-	if(res_valid_i) begin
-		if(res_idx_onehot_i[0])
-			gather_q[0] <= res_data_i[W-1:0]; 
-		if (res_idx_onehot_i[1])
-			{gather_q[1], gather_q[2]} <= res_data_i;
-		if (res_idx_onehot_i[2])
-			gather_q[3] <= res_data_i[N*W-1:W]; 
-	end
+	if(res_idx_onehot0_i[0])
+		gather_q[0] <= res_data_i[W-1:0]; 
+	if (res_idx_onehot0_i[1])
+		{gather_q[1], gather_q[2]} <= res_data_i;
+	if (res_idx_onehot0_i[2])
+		gather_q[3] <= res_data_i[N*W-1:W]; 
 end
 
 // streamout result
@@ -46,7 +42,7 @@ reg             mv_gather_to_stream_q;
 reg  [NN-1:0]    stream_valid_q;
 wire [NN-1:0]    stream_valid_next;
 
-assign mv_gather_to_stream_next = res_idx_onehot_i[2] & res_valid_i; 
+assign mv_gather_to_stream_next = res_idx_onehot0_i[2]; 
 always @(posedge clk) 
 	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
@@ -67,13 +63,14 @@ end
 // slack on output valid path, need as much as we can if we
 // want to push output GPIO Fmax
 reg         out_valid_q; 
-always @(posedge clk) begin
-	if (~rst_n) out_valid_q <= 1'b0; 
-	else output_valid_q <= mv_gather_to_stream_q | |stream_valid_next; // valid is asserted a cycle before data start being sent 
-end
+always @(posedge clk)
+	out_valid_q <= mv_gather_to_stream_q | |stream_valid_next; // valid is asserted a cycle before data start being sent 
 
 // output 
 assign valid_o = out_valid_q;
 assign data_o  = stream_valid_q[W-1:0]; 
 
+`ifdef FORMAL
+	sva_idx_onehot0: assert($onehot0(res_idx_onehot0_i));
+`endif
 endmodule
