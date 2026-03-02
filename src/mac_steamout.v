@@ -14,7 +14,7 @@ module mac_streamout #(
 	input wire clk, 
 
 	// result from systolic array 
-	input wire [2:0]       res_idx_onehot0_i,
+	input wire [2:0]       res_rd_seq_v_i,
 	input wire [N*W-1:0]   res_data_i,
 
 	// output IO interface
@@ -26,11 +26,11 @@ localparam NN = N*N;
 reg [W-1:0] gather_q[NN];
 
 always @(posedge clk) begin
-	if(res_idx_onehot0_i[0])
+	if(res_rd_seq_v_i[0])
 		gather_q[0] <= res_data_i[W-1:0]; 
-	if (res_idx_onehot0_i[1])
+	if (res_rd_seq_v_i[1])
 		{gather_q[1], gather_q[2]} <= res_data_i;
-	if (res_idx_onehot0_i[2])
+	if (res_rd_seq_v_i[2])
 		gather_q[3] <= res_data_i[N*W-1:W]; 
 end
 
@@ -47,7 +47,7 @@ wire [IDX_W-1:0] stream_idx_next;
 wire             stream_idx_underflow;
 wire [IDX_W-1:0] stream_idx_sub1;
 
-assign mv_gather_to_stream_next = res_idx_onehot0_i[2]; 
+assign mv_gather_to_stream_next = res_rd_seq_v_i[2]; 
 always @(posedge clk) 
 	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
@@ -77,6 +77,6 @@ assign valid_o = out_valid_q;
 assign data_o  = stream_q[OUT_W-1:0]; 
 
 `ifdef FORMAL
-	sva_idx_onehot0: assert($onehot0(res_idx_onehot0_i));
+	sva_idx_onehot0: assert($onehot0(res_rd_seq_v_i));
 `endif
 endmodule

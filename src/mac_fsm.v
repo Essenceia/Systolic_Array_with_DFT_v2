@@ -14,7 +14,8 @@ module mac_fsm #(
 	parameter IO_W = 8,
 	parameter W = 16,
 	localparam N = 2,
-	localparam NN = N*N
+	localparam NN = N*N,
+	localparam OSEQ_W = 3
 )(
 	input wire clk, 
 	input wire rst_n, 
@@ -28,8 +29,7 @@ module mac_fsm #(
 
 	output wire mac_step_o, // cam step through 
 
-	output wire [N-1:0] res_rd_o,
-	output wire [N-1:0] res_wr_o // output streaming
+	output wire [OSER_W-1:0] rd_res_seq_v_o // streamout res sequence
 
 );
 /* data modes */
@@ -100,6 +100,8 @@ assign wr_data_v_o = {N{wr_data_v}} & wr_data_row_v;
  * MAC steps, depend on data arrival sequence */
 reg last_step_q;
 reg mac_step_q;
+reg [OSEQ_W-1:0] rd_res_seq_d1_q; // d1: delayed by 1 cycle
+reg [OSEQ_W-1:0] rd_res_seq_q;
 reg en_q;
 always @(posedge clk) 
 	en_q <= ena;
@@ -110,10 +112,10 @@ always @(posedge clk)
 always @(posedge clk) begin
 	if (en_q & wr_data_v)  begin
 		case(wr_data_idx_q) 
-			{2'd0,1'b1}:  mac_step_q <= 1'b1;// 0,0 
-			{2'd2,1'b1}:  mac_step_q <= 1'b1;//1,0 + 0,1
-			{2'd3,1'b1}:  mac_step_q <= 1'b1;//1,1 + last_step next cycle
-			default: mac_step_q <= last_step_q;
+			{2'd0,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b000, 1'b1};// 0,0 
+			{2'd2,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b001, 1'b1};//1,0 + 0,1
+			{2'd3,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b010, 1'b1};//1,1 + last_step next cycle
+			default:     {rd_res_seq_d1_q, mac_step_q} <= {{last_step_q, 2'b00}, last_step_q};
 		endcase
 	end
 end
@@ -122,5 +124,8 @@ assign mac_step_o = mac_step_q;
 /* Streamout sequencer 
  * Data production depends on mac step though which in 
  * turn depends on data arrival */ 
+always @(clk) 
+	rd_res_seq_q <= rd_res_seq_d1_q;
 
+assign rd_res_seq_o = rd_res_seq_q; 
 endmodule

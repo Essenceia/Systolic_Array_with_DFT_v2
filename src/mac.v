@@ -36,7 +36,7 @@ logic          wr_weight_v[N-1:0][N-1:0];
 logic [N-1:0]  wr_data_v;
 reg   [W-1:0]  data_input_q[N-1:0];
 logic          mac_step; 
-logic [N-1:0]  res_rd, res_wr;
+logic [2:0]   rd_res_seq_v;
 
 mac_fsm #(.N(N), .NN(NN)) m_fsm(
 	.clk(clk),
@@ -52,8 +52,7 @@ mac_fsm #(.N(N), .NN(NN)) m_fsm(
 	
 	.mac_step_o(mac_step),
 
-	.res_rd_o(res_rd),
-	.res_wr_o(res_wr)
+	.rd_res_seq_v_o(rd_res_seq_v),
 );
 generate 
 	for(x=0; x<N; x=x+1) begin: g_wr_weight_v_x
@@ -127,7 +126,7 @@ assign debug_res3 = res_unit[1][N-1];
 /* result streamout */
 mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(
 	.clk(clk),
-	.res_idx_onehot0_i(res_rd),
+	.res_rd_seq_v_i(rd_res_seq_v),
 	.res_data_i({res_unit[1][N-1], res_unit[0][N-1]}),
 	.valid_o(result_v_o),
 	.data_o(result_o)
