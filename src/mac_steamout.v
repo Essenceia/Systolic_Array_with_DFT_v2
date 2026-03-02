@@ -50,13 +50,13 @@ assign mv_gather_to_stream_next = res_idx_i[2] & res_valid_i;
 always @(posedge clk) 
 	mv_gather_to_stream_q <= mv_gather_to_stream_next;
 
-assign stream_valid_next = {1'b0, stream_valid_q[(NN-1)-1-:1];
+assign stream_valid_next = {1'b0, stream_valid_q[NN-1:1]};
 always @(posedge clk) begin 
 	if (mv_gather_to_stream_q) begin
 		stream_q <= gather_q;
 		stream_valid_q <= {NN{1'b1}};
 	end else begin
-		stream_q <= {8'b0, stream_q[(NN-1)*W-1-:W]};
+		stream_q <= {8'b0, stream_q[NN*W-1:W]};
 		stream_valid_q <= stream_valid_next;
 	end
 end
