@@ -56,11 +56,14 @@ always @(posedge clk)
 assign wr_weight_v_o = {NN{wr_weight_v}} & wr_weight_pos_q;
 
 /* data write logic
+ *
+ * Control storage located in the streamin module. 
  * Capture incoming data over 8 bit wide bus and feed it to the
  * systolic array. */
-wire [N-1:0]          wr_data_v;
+wire                  wr_data_v;
 reg  [DATA_IDX_W-1:0] wr_data_idx_q;
 reg                   wr_data_idx_carry_unused;
+reg  [N-1:0]          wr_data_row_idx;
 
 assign wr_data_v = data_v_i & (data_mode_i == MODE_DATA);
 
@@ -68,7 +71,17 @@ always @(posedge clk)
 	if (~rst_n | rst_addr ) wr_data_idx_q <= {DATA_IDX_W{1'b0}};
 	else if (wr_data_v) {wr_data_idx_carry_unused, wr_data_idx_q} <= wr_data_idx_q + {{DATA_IDX_W{1'b0}}, 1'b1};
 
-assign wr_data_v_o = { wr_data_pos_q[0], ~wr_data_pos_q[0]};
+// this code will be simplified by synth, maximizing readability
+always @(*) begin
+	case(wr_data_idx_q[DATA_IDX_W-:UNIT_IDX_W])
+		2'd0: wr_data_row_idx <= 2'b01;
+		2'd1: wr_data_row_idx <= 2'b01;
+		2'd2: wr_data_row_idx <= 2'b10;
+		2'd3: wr_data_row_idx <= 2'b10;
+	endcase
+end
+
+assign wr_data_v_o = {N{wr_data_v}} & wr_data_row_idx;
 
 /* N dimention dependant logic 
  *
