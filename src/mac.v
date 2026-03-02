@@ -7,6 +7,7 @@
 `timescale 1ns / 1ps
 
 module mac #(
+	parameter IO_W = 8,
 	parameter W = 8, // data and weight width
 	parameter N = 2, // matrix dimention
 	parameter UREG_ADDR = 4 
@@ -18,13 +19,13 @@ module mac #(
 	input wire         data_v_i,
 	input wire         data_mode_i,
 	input wire         data_rst_addr_i,
-	input wire [W-1:0] data_i, 
+	input wire [IO_W-1:0] data_i, 
 
 	input wire  [UREG_ADDR-1:0] jtag_ureg_addr_i, 
 	output wire [W-1:0]         jtag_ureg_data_o,
 
 	output wire         result_v_o, 
-	output wire [W-1:0] result_o
+	output wire [IO_W-1:0] result_o
 );
 localparam NN = N*N;
 genvar x,y; 
@@ -63,7 +64,7 @@ generate
 endgenerate
 
 /* Steamin data */ 
-mac_steamin #(.IN_W(IN_W), .W(W)) m_mac_data_steamin_2x2(
+mac_steamin #(.IN_W(IO_W), .W(W)) m_mac_data_steamin_2x2(
 	.clk(clk),
 	.data_valid_i(data_v_i),
 	.data_i(data_i),
@@ -125,7 +126,7 @@ assign debug_res2 = res_unit[0][N-1];
 assign debug_res3 = res_unit[1][N-1];
 
 /* result streamout */
-mac_streamout #(.W(W)) m_mac_result_streamout_2x2(
+mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(
 	.clk(clk),
 	.res_idx_onehot0_i(res_rd),
 	.res_data_i({res_unit[1][N-1], res_unit[0][N-1]}),
