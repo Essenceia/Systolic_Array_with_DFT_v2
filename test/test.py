@@ -12,14 +12,6 @@ import jtag_utils
 import asyncio
 from array import array 
 
-N = 2 # matrix dimention 
-
-# cover full range of i8
-MIN_W = -128
-MAX_W =  127
-MIN_I = -128
-MAX_I =  127
-
 def start_clk(dut):
     clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start()) #runs the clock "in the background" 
@@ -44,22 +36,6 @@ async def rst(dut, ena=1, start_jtag=False):
     dut.ena.value = ena
     await ClockCycles(dut.clk,10)
 
-
-def mac(W,I):
-    res = array('b', [0,0,0,0])
-    assert(len(W) == N*N)
-    assert(len(I) == N*N)
-    for x in range(0,N):
-        for y in range(0,N):
-            for ix in range(0,N):
-                tmp = res[y*N+x] + I[y*N+ix]*W[ix*N+x] 
-                if (tmp >= 127):
-                    tmp = 127
-                if (tmp <= -128):
-                    tmp = -128
-                res[y*N+x] = tmp
-    return res
-
 async def read_res(dut):
     res = array('b')
        
@@ -72,7 +48,7 @@ async def read_res(dut):
     return res 
 
 async def compare_res(dut, W, I):
-    expected = mac(W,I)
+    expected = mac_utils.mac(W,I)
     res = await read_res(dut) 
 
     cocotb.log.info("expected vs got :")
@@ -86,8 +62,8 @@ async def compare_res(dut, W, I):
 @cocotb.test()
 async def simple_mac_test(dut):
     await rst(dut) 
-    W = array('b', [0, 1, 2, 3]) 
-    I = array('b', [4, 5, 6, 7])
+    W = array('H', [0, 1, 2, 3]) 
+    I = array('H', [4, 5, 6, 7])
 
     await mac_utils.rst_data_addr(dut)
 

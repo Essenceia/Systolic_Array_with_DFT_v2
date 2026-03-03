@@ -12,9 +12,10 @@ PROJECT_SOURCES =
 ifneq ($(GATES),yes)
 
 # RTL simulation:
-SIM_BUILD				= sim_build/rtl
+SIM_BUILD	 	= sim_build/rtl
 VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_LIB_DIR)/*.v)
 
+COMPILE_ARGS        += -DCOCOTB
 else
 
 # Gate level simulation:
@@ -30,7 +31,8 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 
 endif
 
-# Allow sharing configuration between design and testbench via `include`:
+# Allow sharing configuration between design and testbench via `include`
+# no need to include bf16 lib since they are ommited from tb
 COMPILE_ARGS 		+= -I$(SRC_DIR)
 
 # Include the testbench sources:

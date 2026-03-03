@@ -9,6 +9,18 @@ from array import array
 
 N=2 # CAM array dimention 
 
+BASE_W = 2 # Base type width in bytes
+
+MODE_DATA   = 0
+MODE_WEIGHT = 1
+MODE_RST    = 2
+MODE_ASM    = 3
+
+
+# cover full range of u16
+MIN_VAL = 0
+MAX_VAL = 65535
+
 # Dissable data transfert for "cycles" cycles.
 # Used to simulate realistic conditions where the data transfer
 # from the master (microcontroller, FPGA) would be done in bursts.
@@ -30,25 +42,22 @@ async def invalid_data(dut, cycles):
 #
 # valid - 1 - data transfer contains valid information
 #
-# mode - 2
+# mode - [3:2]
 # value - meaning
 #     0 - cam input data
 #     1 - weight
+#     2 - rst
+#     3 - asm
 #
-# address rst - 3 - rst weight and data addresses
-# 
 # --- JTAG --- 
 # tdi - 4 - input data 
 # tms - 5 - fsm transition selection
 #
-def get_cmd(valid=True, mode=False, rst=False, tdi=False, tms=False):
+def get_cmd(valid=True, mode=MODE_DATA, tdi=False, tms=False):
     ret = 0
     if valid:
         ret |= 1 << 1
-    if mode:
-        ret |= 1 << 2
-    if rst:
-        ret |= 1 << 3
+    ret |= mode << 2
     if tdi:
         ret |= 1 << 4
     if tms: 
@@ -56,8 +65,10 @@ def get_cmd(valid=True, mode=False, rst=False, tdi=False, tms=False):
 
     return ret
 
+# Signed to Unsigned
 def stou(n): 
   return int.from_bytes(n.to_bytes(1, 'little', signed=True), 'little', signed=False)
+
 # Configure weight values.
 #
 # In practice it is not necessary for the weight config to be 
@@ -69,26 +80,24 @@ def stou(n):
 # array. Since weights have better temporal locality, the tradeoff was
 # made in favor of the weights. 
 async def write_config(dut, X, weight=True):
+    mode = MODE_WEIGHT if weight == True else MODE_DATA 
     assert(len(X) == N*N) 
-    config = bytearray(0)
-    for x in X: 
-        assert(x >= -128 and x <= 127)
-        config.append(stou(x))
+    config = X.tobytes()
 
-    for i in range(0,N*N):
+    cocotb.log.info("config %s", config)
+
+    for i in range(0,N*N*BASE_W):
         if (random.randrange(0,100) > 75):
             await invalid_data(dut, random.randrange(1,5)) 
         dut.ui_in.value = (config[i] << 1) & 0xFE
-        uio_in = get_cmd(valid=True, mode=weight) | (config[i] >> 7 & 0x01)
+        uio_in = get_cmd(valid=True, mode=mode) | (config[i] >> 7 & 0x01)
         dut.uio_in.value = uio_in
         cocotb.log.debug("write config %d:%s %s", i, config[i], uio_in)
         await ClockCycles(dut.clk,1)
     dut.uio_in.value = 0
 
 async def rst_data_addr(dut):
-    dut.uio_in.value = get_cmd(valid=True, mode=False, rst=True)
-    await ClockCycles(dut.clk, 1)
-    dut.uio_in.value = get_cmd(valid=True, mode=True, rst=True)
+    dut.uio_in.value = get_cmd(valid=True, mode=MODE_RST)
     await ClockCycles(dut.clk, 1)
 
 
@@ -103,4 +112,22 @@ def biased_random(min, max):
     if (random.randint(0,1)):
         return random.randint(-10,10)
     return random.randint(min, max)
-    
+   
+
+
+def clamp(x): 
+    if (x >= MAX_VAL): 
+        return MAX_VAL
+    return x
+
+def mac(W,I):
+    res = array('H', [0,0,0,0])
+    assert(len(W) == N*N*BASE_W)
+    assert(len(I) == N*N*BASE_W)
+    for x in range(0,N):
+        for y in range(0,N):
+            for ix in range(0,N):
+                mul = clamp(I[y*N+ix]*W[ix*N+x])
+                tmp = clamp(res[y*N+x] +  mul)
+                res[y*N+x] = tmp
+    return res

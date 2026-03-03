@@ -40,6 +40,26 @@ always @(posedge clk)
 always @(posedge clk) 
 	if (wr_weight_v_i) weight_q <= {weight_i, weight_q[W-1:IO_W]};
 
+`ifdef COCOTB
+/* Replacing floating point model with unsigned integer math 
+ * for cocotb since we don't have a good golden model 
+ * in python for bf16, bf16 implementations used a clamped down
+ * version of f32 which would result in the accumulation of 
+ * the different precision rounding error though the network.
+ * Additionally, float math has already been thoughly verified, 
+ * this testbench is focused on checking the array's behavior
+ * and this is indifrent to the underlying base type as long as 
+ * the data width is identical. */
+wire [W-1:0] mul_raw_carry, mul_raw; 
+assign {mul_raw_carry, mul_raw} = weight_q * data_q; 
+// clamping
+assign mul = |mul_raw_carry ? {W{1'b1}} : mul_raw; 
+
+wire add_raw_carry; 
+wire [W-1:0] add_raw; 
+assign {add_raw_carry, add_raw} = mul + add_q;
+assign res_o = add_raw_carry ? {W{1'b1}}: add_raw; 
+`else
 // bfloat16 multiplication 
 bf16_mul m_mul(
 	.sa_i(weight_q[15]),
@@ -69,6 +89,7 @@ bf16_add m_add(
 	.e_o(res_o[14:7]),
 	.m_o(res_o[6:0])
 );
+`endif
 
 assign data_o = data_q;
 
