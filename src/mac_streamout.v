@@ -37,7 +37,11 @@ end
 // streamout result
 localparam MAX_IDX = ((NN)*(W/OUT_W)) + 1; 
 localparam IDX_W   = $clog2(MAX_IDX);
+/*verilator lint_off WIDTHTRUNC */
+// WIDTHTRUNC since MAX_IDX is assumed to be singed, and 
+// we are dropping the sign bit in RST_IDX
 localparam [IDX_W-1:0] RST_IDX = MAX_IDX;
+/*verilator lint_on WIDTHTRUNC */
 
 reg [NN*W-1:0]   stream_q;
 wire             mv_gather_to_stream_next;
