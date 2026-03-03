@@ -39,9 +39,9 @@ async def rst(dut, ena=1, start_jtag=False):
 async def read_res(dut):
     res = array('b')
        
-    while (len(res) != N*N):
+    while (len(res) != mac_utils.RES_SIZE):
         if (dut.result_v.value == 1):
-            x = dut.uo_out.value.to_signed()
+            x = dut.uo_out.value
             res.append(x)
         await ClockCycles(dut.clk, 1)
     

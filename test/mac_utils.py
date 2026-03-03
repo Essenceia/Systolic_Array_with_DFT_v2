@@ -8,8 +8,11 @@ import random
 from array import array 
 
 N=2 # CAM array dimention 
+NN = 2*2
 
 BASE_W = 2 # Base type width in bytes
+
+RES_SIZE = N*N*BASE_W
 
 MODE_DATA   = 0
 MODE_WEIGHT = 1
@@ -81,12 +84,12 @@ def stou(n):
 # made in favor of the weights. 
 async def write_config(dut, X, weight=True):
     mode = MODE_WEIGHT if weight == True else MODE_DATA 
-    assert(len(X) == N*N) 
+    assert(len(X) == NN) 
     config = X.tobytes()
 
     cocotb.log.info("config %s", config)
 
-    for i in range(0,N*N*BASE_W):
+    for i in range(0,NN*BASE_W):
         if (random.randrange(0,100) > 75):
             await invalid_data(dut, random.randrange(1,5)) 
         dut.ui_in.value = (config[i] << 1) & 0xFE
@@ -122,8 +125,8 @@ def clamp(x):
 
 def mac(W,I):
     res = array('H', [0,0,0,0])
-    assert(len(W) == N*N*BASE_W)
-    assert(len(I) == N*N*BASE_W)
+    assert(len(W) == NN)
+    assert(len(I) == NN)
     for x in range(0,N):
         for y in range(0,N):
             for ix in range(0,N):
