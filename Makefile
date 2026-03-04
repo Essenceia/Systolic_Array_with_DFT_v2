@@ -76,7 +76,7 @@ test:
 	$(MAKE) -C $(TB_DIR) WAVES=1
 
 waves: 
-	gtkwave $(TB_DIR)/tb.vcd $(TB_DIR)/tb.gtkw &
+	gtkwave $(TB_DIR)/tb.vcd $(CONF)/tb.gtkw &
 
 ###############
 # Test vector #
@@ -116,7 +116,6 @@ clean:
 	rm -f callgrind.out.*
 	rm -fr build/*
 	rm -fr obj_dir/*
-	rm -fr $(WAVE_DIR)/*
+	$(MAKE) -C $(TB_DIR) clean
 	$(MAKE) -C $(FPGA_DIR) clean
 	$(MAKE) -C $(SW_DIR) clean
-
