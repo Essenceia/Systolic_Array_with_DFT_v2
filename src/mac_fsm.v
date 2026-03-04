@@ -5,7 +5,7 @@
  *
  * This code will be simplified by synth, maximizing readability
  * 
- * Julia Desmazes, 2026, this code is human made
+ * Julia Desmazes, 2026, human made code
  */
 
 `timescale 1ns / 1ps
@@ -119,7 +119,7 @@ always @(posedge clk) begin
 			{2'd3,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b010, 1'b1};//1,1 + last_step next cycle
 			default:     {rd_res_seq_d1_q, mac_step_q} <= {{last_step_q, 2'b00}, last_step_q};
 		endcase
-	end
+	end else {rd_res_seq_d1_q, mac_step_q} <= {3'b000, 1'b0};
 end
 assign mac_step_o = mac_step_q;
 
