@@ -73,7 +73,7 @@ lint_fpga: $(fpga_deps)
 #############
 # Call cocotb
 test:
-	$(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) $(DEBUG_FLAG)
+	$(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) COCOTB_LOG_LEVEL=$(if $(debug),DEBUG,INFO)
 
 waves: 
 	gtkwave $(TB_DIR)/tb.vcd $(CONF)/tb.gtkw &
