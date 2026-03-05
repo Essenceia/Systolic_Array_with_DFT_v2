@@ -4,7 +4,7 @@
 
 import cocotb
 from cocotb.clock import Clock
-from cocotb.triggers import FallingEdge, RisingEdge, ClockCycles
+from cocotb.triggers import FallingEdge, RisingEdge, ClockCycles, with_timeout
 
 import random 
 import mac_utils
@@ -12,12 +12,18 @@ import jtag_utils
 import asyncio
 from array import array 
 
+CLK_UNIT="us"
+CLK_PERIOD=10
+TCK_UNIT="us" 
+TCK_PERIOD=CLK_UNIT
+CLK_TIMEOUT_PERIOD=(CLK_PERIOD*1000)
+
 def start_clk(dut):
-	clock = Clock(dut.clk, 10, unit="us")
+	clock = Clock(dut.clk, CLK_PERIOD, CLK_UNIT)
 	cocotb.start_soon(clock.start()) #runs the clock "in the background" 
 
 def start_jtag_clk(dut):
-	jtag_clk = Clock(dut.tck, 77, unit="us")
+	jtag_clk = Clock(dut.tck, TCK_UNIT, TCK_PERIOD)
 	cocotb.start_soon(jtag_clk.start())
 
 # Reset sequence
@@ -53,11 +59,12 @@ async def compare_res(dut, W, I):
 	cocotb.log.info("expected vs got :")
 	cocotb.log.info(' '.join(map(str, expected)))
 	try:
-		res = await asyncio.wait_for(read_res(dut), timeout=1.0)
-		cocotb.log.info(' '.join(map(str, res)))
-	except asyncio.TimeoutError:
+		res = await with_timeout(read_res(dut), CLK_TIMEOUT_PERIOD, CLK_UNIT) 
+	except TimeoutError:
 		cocotb.log.error("Result returned has stalled")
-
+		
+	cocotb.log.info(' '.join(map(str, res)))
+	
 	assert(res == expected) 
 
 # MAC tests 
