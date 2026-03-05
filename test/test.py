@@ -44,14 +44,15 @@ async def rst(dut, ena=1, start_jtag=False):
 
 async def read_res(dut):
 	res = array('b')
+	ret = array('H')#return type, convert byte to uint16
 	   
 	while (len(res) != mac_utils.RES_SIZE):
 		if (dut.result_v.value == 1):
 			x = dut.uo_out.value
 			res.append(x)
 		await ClockCycles(dut.clk, 1)
-	
-	return res 
+	ret.frombytes(res)
+	return ret
 
 async def compare_res(dut, W, I):
 	expected = mac_utils.mac(W,I)
