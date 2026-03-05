@@ -112,7 +112,7 @@ always @(posedge clk)
 	last_step_q <= wr_data_v & en_q & (wr_data_idx_q == {2'd3, 1'b1}); 
 
 always @(posedge clk) begin
-	if (en_q & wr_data_v)  begin
+	if (en_q & (wr_data_v | last_step_q))  begin
 		case(wr_data_idx_q) 
 			{2'd0,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b000, 1'b1};// 0,0 
 			{2'd2,1'b1}: {rd_res_seq_d1_q, mac_step_q} <= {3'b001, 1'b1};//1,0 + 0,1

@@ -61,10 +61,10 @@ async def compare_res(dut, W, I):
 	try:
 		res = await with_timeout(read_res(dut), CLK_TIMEOUT_PERIOD, CLK_UNIT) 
 	except TimeoutError:
-		cocotb.log.error("Result returned has stalled")
-		
-	cocotb.log.info(' '.join(map(str, res)))
+		cocotb.log.error("Result returned has stalled for read_res")
+		res=array('H')
 	
+	cocotb.log.info(' '.join(map(str, res)))
 	assert(res == expected) 
 
 # MAC tests 
