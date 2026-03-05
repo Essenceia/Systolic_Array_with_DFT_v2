@@ -2,7 +2,7 @@
 
 ## Workflow 
 
-[ ] Create a sub-macro containing all the systollic array: would make inserting the dft scan chain cleaner
+- [ ] Create a sub-macro containing all the systollic array: would make inserting the dft scan chain cleaner?
 
 ## SWD 
 Idea cancelled due to legal risk involved with designing a JTAG-AP over SWD ... I might mistakenly infringe on a pattent 
@@ -29,5 +29,11 @@ So I should just add the ff bank, still no use for the SRAM though.
 
 ## Desing
 
-- [ ] cleanup MAC FSM 
-    - [ ] rework output fifo and make it bank based to output only a continous data stream 
+- [x] cleanup MAC FSM 
+- [x] rework output fifo and make it bank based to output only a continous data stream 
+
+# JTAG
+
+- [ ] add scan chain interface
+- [ ] add scan chain test for gate sim mode
+
