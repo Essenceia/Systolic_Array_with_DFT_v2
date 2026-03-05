@@ -12,6 +12,7 @@ module mac_streamout #(
 	localparam N = 2 // currently designed for a 2x2 array
 )(
 	input wire clk, 
+	input wire rst_n,
 
 	// result from systolic array 
 	input wire [2:0]       res_rd_seq_v_i,
@@ -35,8 +36,8 @@ always @(posedge clk) begin
 end
 
 // streamout result
-localparam MAX_IDX = ((NN)*(W/OUT_W)) + 1; 
-localparam IDX_W   = $clog2(MAX_IDX);
+localparam MAX_IDX = ((NN)*(W/OUT_W)); 
+localparam IDX_W   = $clog2(MAX_IDX+1);
 /*verilator lint_off WIDTHTRUNC */
 // WIDTHTRUNC since MAX_IDX is assumed to be singed, and 
 // we are dropping the sign bit in RST_IDX
@@ -57,8 +58,10 @@ always @(posedge clk)
 
 assign {stream_idx_underflow, stream_idx_sub1} = stream_idx_q - {{IDX_W-1{1'b0}},1'd1};
 assign stream_idx_next = stream_idx_underflow ? {IDX_W{1'd0}} : stream_idx_sub1;
-always @(posedge clk) begin 
-	if (mv_gather_to_stream_q) begin
+always @(posedge clk) begin
+	if(~rst_n) begin
+		stream_idx_q <= {IDX_W{1'b0}};
+	end else if (mv_gather_to_stream_q) begin
 		stream_q <= {gather_q[3], gather_q[2], gather_q[1], gather_q[0]};
 		stream_idx_q <= RST_IDX;
 	end else begin

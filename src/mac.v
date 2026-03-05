@@ -124,6 +124,7 @@ assign debug_res3 = res_unit[1][N-1];
 /* result streamout */
 mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(
 	.clk(clk),
+	.rst_n(rst_n),
 	.res_rd_seq_v_i(rd_res_seq_v),
 	.res_data_i({res_unit[1][N-1], res_unit[0][N-1]}),
 	.valid_o(result_v_o),
