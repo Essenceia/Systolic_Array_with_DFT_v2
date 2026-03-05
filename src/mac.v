@@ -115,11 +115,11 @@ generate
 		end
 	end
 endgenerate
-wire [W-1:0] debug_res0, debug_res1, debug_res2, debug_res3; 
-assign debug_res0 = res_unit[0][0]; 
-assign debug_res1 = res_unit[1][0]; 
-assign debug_res2 = res_unit[0][N-1]; 
-assign debug_res3 = res_unit[1][N-1];
+wire [W-1:0] debug_res0_0, debug_res1_0, debug_res0_1, debug_res1_1; 
+assign debug_res0_0 = res_unit[0][0]; 
+assign debug_res1_0 = res_unit[1][0]; 
+assign debug_res0_1 = res_unit[0][N-1]; 
+assign debug_res1_1 = res_unit[1][N-1];
 
 /* result streamout */
 mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(

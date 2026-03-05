@@ -89,8 +89,8 @@ always @(posedge clk)
 always @(*) begin
 	case(wr_data_idx_q[DATA_IDX_W-1-:UNIT_IDX_W])
 		2'd0: wr_data_row_v = 2'b01;
-		2'd1: wr_data_row_v = 2'b01;
-		2'd2: wr_data_row_v = 2'b10;
+		2'd1: wr_data_row_v = 2'b10;
+		2'd2: wr_data_row_v = 2'b01;
 		2'd3: wr_data_row_v = 2'b10;
 	endcase
 end

@@ -130,7 +130,5 @@ def mac(W,I):
     for x in range(0,N):
         for y in range(0,N):
             for ix in range(0,N):
-                mul = clamp(I[y*N+ix]*W[ix*N+x])
-                tmp = clamp(res[y*N+x] +  mul)
-                res[y*N+x] = tmp
+                res[y*N+x] = clamp(res[y*N+x] + clamp(I[y*N+ix]*W[ix*N+x]))
     return res
