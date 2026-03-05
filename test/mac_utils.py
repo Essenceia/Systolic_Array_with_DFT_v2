@@ -14,10 +14,10 @@ BASE_W = 2 # Base type width in bytes
 
 RES_SIZE = N*N*BASE_W
 
-MODE_DATA   = 0
+MODE_DATA	= 0
 MODE_WEIGHT = 1
-MODE_RST    = 2
-MODE_ASM    = 3
+MODE_RST	= 2
+MODE_ASM	= 3
 
 
 # cover full range of u16
@@ -31,10 +31,10 @@ MAX_VAL = 65535
 # stalled due to the DMA transfer no keeping up with the PIO write
 # rate and the TX FIFO being empty. 
 async def invalid_data(dut, cycles):
-    for i in range(0, cycles):
-        dut.uio_in.value = 0
-        dut.ui_in.value = 0
-        await ClockCycles(dut.clk,1)
+	for i in range(0, cycles):
+		dut.uio_in.value = 0
+		dut.ui_in.value = 0
+		await ClockCycles(dut.clk,1)
 
 
 
@@ -47,26 +47,26 @@ async def invalid_data(dut, cycles):
 #
 # mode - [3:2]
 # value - meaning
-#     0 - cam input data
-#     1 - weight
-#     2 - rst
-#     3 - asm
+#	  0 - cam input data
+#	  1 - weight
+#	  2 - rst
+#	  3 - asm
 #
 # --- JTAG --- 
 # tdi - 4 - input data 
 # tms - 5 - fsm transition selection
 #
 def get_cmd(valid=True, mode=MODE_DATA, tdi=False, tms=False):
-    ret = 0
-    if valid:
-        ret |= 1 << 1
-    ret |= mode << 2
-    if tdi:
-        ret |= 1 << 4
-    if tms: 
-        ret |= 1 << 5
+	ret = 0
+	if valid:
+		ret |= 1 << 1
+	ret |= mode << 2
+	if tdi:
+		ret |= 1 << 4
+	if tms: 
+		ret |= 1 << 5
 
-    return ret
+	return ret
 
 # Signed to Unsigned
 def stou(n): 
@@ -83,52 +83,48 @@ def stou(n):
 # array. Since weights have better temporal locality, the tradeoff was
 # made in favor of the weights. 
 async def write_config(dut, X, weight=True):
-    mode = MODE_WEIGHT if weight == True else MODE_DATA 
-    assert(len(X) == NN) 
-    config = X.tobytes()
+	mode = MODE_WEIGHT if weight == True else MODE_DATA 
+	assert(len(X) == NN) 
+	config = X.tobytes()
 
-    cocotb.log.info("config %s", config)
+	cocotb.log.info("config %s", config)
 
-    for i in range(0,NN*BASE_W):
-        if (random.randrange(0,100) > 75):
-            await invalid_data(dut, random.randrange(1,5)) 
-        dut.ui_in.value = (config[i] << 1) & 0xFE
-        uio_in = get_cmd(valid=True, mode=mode) | (config[i] >> 7 & 0x01)
-        dut.uio_in.value = uio_in
-        cocotb.log.debug("write config %d:%s %s", i, config[i], uio_in)
-        await ClockCycles(dut.clk,1)
-    dut.uio_in.value = 0
+	for i in range(0,NN*BASE_W):
+		if (random.randrange(0,100) > 75):
+			await invalid_data(dut, random.randrange(1,5)) 
+		dut.ui_in.value = (config[i] << 1) & 0xFE
+		uio_in = get_cmd(valid=True, mode=mode) | (config[i] >> 7 & 0x01)
+		dut.uio_in.value = uio_in
+		cocotb.log.debug("write config %d:%s %s", i, config[i], uio_in)
+		await ClockCycles(dut.clk,1)
+	dut.uio_in.value = 0
 
 async def rst_data_addr(dut):
-    dut.uio_in.value = get_cmd(valid=True, mode=MODE_RST)
-    await ClockCycles(dut.clk, 1)
+	dut.uio_in.value = get_cmd(valid=True, mode=MODE_RST)
+	await ClockCycles(dut.clk, 1)
 
 
 # bias random towards smaller number to get better coverage of math operations
 def biased_random(min, max):
-    assert(min <= -15)
-    assert(max >= 15)
-    if (random.randint(0,1)):
-        return random.randint(-5,5)
-    if (random.randint(0,1)):
-        return random.randint(-8,8)
-    if (random.randint(0,1)):
-        return random.randint(-10,10)
-    return random.randint(min, max)
-   
-
+	if (random.randint(0,1)):
+		return random.randint(min, 500)
+	if (random.randint(0,1)):
+		return random.randint(min, 100)
+	if (random.randint(0,1)):
+		return random.randint(min, 50)
+	return random.randint(min, max)
 
 def clamp(x): 
-    if (x >= MAX_VAL): 
-        return MAX_VAL
-    return x
+	if (x >= MAX_VAL): 
+		return MAX_VAL
+	return x
 
 def mac(W,I):
-    res = array('H', [0,0,0,0])
-    assert(len(W) == NN)
-    assert(len(I) == NN)
-    for x in range(0,N):
-        for y in range(0,N):
-            for ix in range(0,N):
-                res[y*N+x] = clamp(res[y*N+x] + clamp(I[y*N+ix]*W[ix*N+x]))
-    return res
+	res = array('H', [0,0,0,0])
+	assert(len(W) == NN)
+	assert(len(I) == NN)
+	for x in range(0,N):
+		for y in range(0,N):
+			for ix in range(0,N):
+				res[y*N+x] = clamp(res[y*N+x] + clamp(I[y*N+ix]*W[ix*N+x]))
+	return res

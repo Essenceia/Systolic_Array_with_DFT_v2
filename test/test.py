@@ -14,8 +14,8 @@ from array import array
 
 CLK_UNIT="us"
 CLK_PERIOD=10
-TCK_UNIT="us" 
-TCK_PERIOD=CLK_UNIT
+TCK_UNIT=CLK_UNIT 
+TCK_PERIOD=77
 CLK_TIMEOUT_PERIOD=(CLK_PERIOD*1000)
 
 def start_clk(dut):
@@ -23,7 +23,7 @@ def start_clk(dut):
 	cocotb.start_soon(clock.start()) #runs the clock "in the background" 
 
 def start_jtag_clk(dut):
-	jtag_clk = Clock(dut.tck, TCK_UNIT, TCK_PERIOD)
+	jtag_clk = Clock(dut.tck, TCK_PERIOD, TCK_UNIT)
 	cocotb.start_soon(jtag_clk.start())
 
 # Reset sequence
@@ -43,7 +43,7 @@ async def rst(dut, ena=1, start_jtag=False):
 	await ClockCycles(dut.clk,10)
 
 async def read_res(dut):
-	res = array('b')
+	res = array('B')
 	ret = array('H')#return type, convert byte to uint16
 	   
 	while (len(res) != mac_utils.RES_SIZE):
@@ -57,14 +57,13 @@ async def read_res(dut):
 async def compare_res(dut, W, I):
 	expected = mac_utils.mac(W,I)
 
-	cocotb.log.info("expected vs got :")
-	cocotb.log.info(' '.join(map(str, expected)))
 	try:
 		res = await with_timeout(read_res(dut), CLK_TIMEOUT_PERIOD, CLK_UNIT) 
 	except TimeoutError:
 		cocotb.log.error("Result returned has stalled for read_res")
-		res=array('H')
 	
+	cocotb.log.info("expected vs got :")
+	cocotb.log.info(' '.join(map(str, expected)))
 	cocotb.log.info(' '.join(map(str, res)))
 	assert(res == expected) 
 
@@ -97,11 +96,11 @@ async def random_mac_test(dut):
 	await rst(dut)
 	await mac_utils.rst_data_addr(dut)
 	for _ in range(0, 500): 
-		W = array('b')
-		I = array('b')
+		W = array('H')
+		I = array('H')
 		for _ in range(0,4):
-			W.append(mac_utils.biased_random(MIN_W,MAX_W))
-			I.append(mac_utils.biased_random(MIN_I,MAX_I))
+			W.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
+			I.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
 
 
 		# send weights 
@@ -122,15 +121,15 @@ async def random_mac_reuse_weights_test(dut):
 	await rst(dut)
 	await mac_utils.rst_data_addr(dut)
 	for _ in range(0, 20): 
-		W = array('b')
+		W = array('H')
 		for _ in range(0,4):
-			W.append(mac_utils.biased_random(MIN_W,MAX_W))
+			W.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
 		await mac_utils.write_config(dut, W, weight=True)
 
 		for _ in range(0, 50): 
-			I = array('b')
+			I = array('H')
 			for _ in range(0,4):
-				I.append(mac_utils.biased_random(MIN_I,MAX_I))
+				I.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
 	
 			# check result - results can start streaming before all the 
 			# data has been written 
@@ -194,11 +193,11 @@ async def jtag_user_reg_test(dut):
 	await jtag_utils.rst_jtag_tap(dut)
 
 	for _ in range(0, 20):
-		W = array('b')
-		I = array('b')
+		W = array('H')
+		I = array('H')
 		for _ in range(0,4):
-			W.append(mac_utils.biased_random(MIN_W,MAX_W))
-			I.append(mac_utils.biased_random(MIN_I,MAX_I))
+			W.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
+			I.append(mac_utils.biased_random(mac_utils.MIN_VAL,mac_utils.MAX_VAL))
 
 		# send weights 
 		await mac_utils.write_config(dut, W, weight=True)
