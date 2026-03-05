@@ -87,7 +87,7 @@ async def write_config(dut, X, weight=True):
 	assert(len(X) == NN) 
 	config = X.tobytes()
 
-	cocotb.log.info("config %s", config)
+	cocotb.log.debug("config %s", config)
 
 	for i in range(0,NN*BASE_W):
 		if (random.randrange(0,100) > 75):

@@ -137,11 +137,11 @@ def decode_idcode(idcode):
     return v, part, manif
 
 def pretty_print_idcode(v, part, manif):
-    cocotb.log.info("idcode: { version %s, part num %s, manifacturer id %s}", hex(v), hex(part), hex(manif))
+    cocotb.log.debug("idcode: { version %s, part num %s, manifacturer id %s}", hex(v), hex(part), hex(manif))
 
 async def get_idcode(dut):
     await set_ir(dut, IDCODE, IR_L)
-    cocotb.log.info("start read dr")
+    cocotb.log.debug("start read dr")
     idcode = await read_dr(dut, 32)
     v, p, m = decode_idcode(idcode)
     pretty_print_idcode(v,p,m)
@@ -186,8 +186,8 @@ async def test_bypass(dut):
     tdo_buffer.append(tdo) 
 
     # check bypass results, input should match output
-    cocotb.log.info("tdi %s", tdi_buffer)
-    cocotb.log.info("tdo %s", tdo_buffer)
+    cocotb.log.debug("tdi %s", tdi_buffer)
+    cocotb.log.debug("tdo %s", tdo_buffer)
     assert(tdi_buffer == tdo_buffer) 
      
     # update dr
@@ -268,7 +268,7 @@ async def test_bsc(dut, extest=True):
         await ClockCycles(dut.tck, 1)
         tdo = dut.uio_out.value[6]
         if (i-1 > PIN_OUT_N-1):
-            cocotb.log.info("i %d %s", i, tdo)
+            cocotb.log.debug("i %d %s", i, tdo)
             tdo_buffer.append(tdo)
     
     # exit 1r

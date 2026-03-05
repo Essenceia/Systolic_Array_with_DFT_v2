@@ -73,7 +73,7 @@ lint_fpga: $(fpga_deps)
 #############
 # Call cocotb
 test:
-	$(MAKE) -C $(TB_DIR) WAVES=1
+	$(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) $(DEBUG_FLAG)
 
 waves: 
 	gtkwave $(TB_DIR)/tb.vcd $(CONF)/tb.gtkw &
@@ -100,7 +100,7 @@ gdb:
 	$(MAKE) -C $(SW_DIR) gdb
 
 #############
-# FPGA      #
+# FPGA      # <- hand aligning these little boxes is a pain
 #############
 # Build vivado project and run PnR, not generating bitstream or flashing
 fpga:
