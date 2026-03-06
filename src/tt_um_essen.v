@@ -60,13 +60,9 @@ wire tms;
 wire tdo;
 wire trst; 
 
-/* verilator lint_off UNUSEDSIGNAL */
-(* KEEP = "true"*) wire ff_sc_en, ff_sc_tdi;
-/* verilator lint_on UNUSEDSIGNAL */
-/* verilator lint_off UNDRIVEN */
-(* KEEP = "true"*) wire ff_sc_tdo;
-/* verilator lint_on UNDRIVEN */
-
+wire ff_sc_en;
+wire ff_sc_tdi;
+wire ff_sc_tdo;
 
 assign bsc_chain[0] = tdi;
 assign bsc_tdo = bsc_chain[BSC_CHAIN_W-1];
@@ -162,6 +158,10 @@ mac #(.W(W), .IO_W(IO_W), .N(2)) m_2x2_systolic_mac(
 
 	.jtag_ureg_addr_i(ureg_addr),
 	.jtag_ureg_data_o(ureg_data),
+
+	.ff_sc_en_i(ff_sc_en),
+	.ff_sc_tdi_i(ff_sc_tdi),
+	.ff_sc_tdo_o(ff_sc_tdo),
 
 	.result_v_o(result_v),
 	.result_o(result)
