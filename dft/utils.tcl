@@ -1,20 +1,5 @@
-proc get_driving_dff_inst { net } {
-	foreach p [get_pins -of_object $net] {
-		set driver_pin [get_name $p] 
-		if {$driver_pin == "Q"} {
-			return [$p instance]
-		}
-	}
-	puts "WARNING: driving ff not found for [get_name $net]"
-}
-
-proc get_all_jtag_ff { match } {
-	set ff_inst {}
-	set nets [get_nets $match]
-	foreach n $nets {
-		lappend ff_inst [get_driving_dff_inst $n]
-	}
-	return $ff_inst
+proc get_all_ff { clk } {
+	return [get_cells [all_registers -clock $clk ]]
 }
 
 proc set_dont_touch_instance_list { ilist } {
@@ -29,10 +14,19 @@ foreach i $ilist {
 	}	
 }
 
+proc exclude_from_scan_chain { jtag_clk } {
+	set jtag_dff [get_all_ff $jtag_clk]
+	set_dont_touch_instance_list $jtag_dff
+}
+
+proc cleanup_dont_touch { jtag_clk } {
+	set jtag_dff [get_all_ff $jtag_clk]
+	clear_dont_touch_instance_list $jtag_dff
+}
+
 proc add_scan_chain { } {
-	# exclude jtag from scan chain
-	set jtag_inst_list [get_all_jtag_ff m_jtag*]
-	set_dont_touch_instance_list $jtag_inst_list 
+
+	puts "Current state of don't touch, will be excluded from scan chain"
 	report_dont_touch 
 	
 	scan_replace
@@ -41,22 +35,18 @@ proc add_scan_chain { } {
 
 	execute_dft_plan 
 
-	clear_dont_touch_instance_list $jtag_inst_list
-
-	report_dont_touch
 }
 
-proc get_ff_q_net_name { inst } {
-	
+proc count_scan_chains { block } {
+	set dft [$block getDft]
 }
-	
+
 proc write_scan_chain_translate { filename block } {
 	set csv_out [open "$filename" "w"]
 	set dft [$block getDft]
 	set chains [$dft getScanChains]
 	if { [llength $chains] > 1 } {
-		puts "Warning: expecting a single chain !"
-		error
+		utl::error ADD_SCAN_CHAIN_TCL 2  "Warning: expecting a single chain! got {}" [llength $chains]
 	}
 	foreach chain $chains {
 		puts  "Writing scan chain '[$chain getName]' to file"

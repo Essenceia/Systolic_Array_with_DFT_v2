@@ -116,7 +116,7 @@ wire [UREG_ADDR_W-1:0] ureg_addr;
 wire [UREG_DATA_W-1:0] ureg_data;
 
 jtag #(.IR_W(3), 
-	.VERSION_NUM(4'h1),
+	.VERSION_NUM(4'h2),// <- v2 second tapeout
 	.PART_NUM(16'hbeef),
 	.MANIFACTURE_ID(11'h6b),// <-- do you get the joke ? 
 	.UREG_ADDR_W(UREG_ADDR_W),
