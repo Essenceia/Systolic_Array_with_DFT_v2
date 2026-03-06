@@ -43,6 +43,10 @@
 
   "RUN_POST_CTS_RESIZER_TIMING": "True", 
   "RUN_POST_GRT_RESIZER_TIMING": "True",
+  
+
+  "LINTER_DISABLE_WARNINGS"	:["DECLFILENAME", "EOFNEWLINE", "TIMESCALEMOD"],
+  "LINTER_VLT": "dir::../conf/waiver.vlt",
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
   "//": "!!! DO NOT CHANGE ANYTHING BELOW THIS POINT !!!",
   "//": "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
