@@ -60,6 +60,14 @@ wire tms;
 wire tdo;
 wire trst; 
 
+/* verilator lint_off UNUSEDSIGNAL */
+(* KEEP = "true"*) wire ff_sc_en, ff_sc_tdi;
+/* verilator lint_on UNUSEDSIGNAL */
+/* verilator lint_off UNDRIVEN */
+(* KEEP = "true"*) wire ff_sc_tdo;
+/* verilator lint_on UNDRIVEN */
+
+
 assign bsc_chain[0] = tdi;
 assign bsc_tdo = bsc_chain[BSC_CHAIN_W-1];
 
@@ -133,6 +141,10 @@ jtag #(.IR_W(3),
 	.bsc_mode_o(bsc_mode),
 
 	.bsc_tdo_i(bsc_tdo),
+
+	.ff_sc_tdi_o(ff_sc_tdi),
+	.ff_sc_en_o(ff_sc_en),
+	.ff_sc_tdo_i(ff_sc_tdo),
 
 	.ureg_addr_o(ureg_addr),
 	.ureg_data_i(ureg_data)

@@ -25,12 +25,18 @@ module jtag #(
 	input wire  trst_i, // optional, adding to guaranty FSM is in reset to help reduce power 
 	output wire tdo_o,
 
+	// Boundary Scan Chain
 	output wire bsc_shift_o,
 	output wire bsc_capture_o,
 	output wire bsc_update_o,
 	output wire bsc_mode_o,
 
 	input wire bsc_tdo_i,
+
+	// FF Scan Chain
+	output wire ff_sc_en_o,
+	output wire ff_sc_tdi_o,
+	input wire  ff_sc_tdo_i,
 
 	output wire [UREG_ADDR_W-1:0] ureg_addr_o,
 	input wire  [UREG_DATA_W-1:0] ureg_data_i	
@@ -44,6 +50,7 @@ localparam [IR_W-1:0] EXTEST         = {IR_W{1'b0}};// 0 - spec defined
 localparam [IR_W-1:0] IDCODE         = {{IR_W-1{1'b0}}, 1'b1}; // 1
 localparam [IR_W-1:0] SAMPLE_PRELOAD = {{IR_W-2{1'b0}}, 2'd2}; // 2
 localparam [IR_W-1:0] USER_REG       = {{IR_W-2{1'b0}}, 2'd3}; // 3
+localparam [IR_W-1:0] FF_SCAN        = 3'd4;                   // 4
 /* verilator lint_off UNUSEDPARAM */
 localparam [IR_W-1:0] BYPASS         = {IR_W{1'b1}};         // max
 /* verilator lint_on UNUSEDPARAM */
@@ -157,6 +164,10 @@ always @(posedge tck_i) begin
 end
 assign ureg_addr_o = ureg_addr_q; 
 
+/* FF_SCAN_CHAIN */
+assign ff_sc_en_o = (ir == FF_SCAN) & (fsm_q == DR_SHIFT);
+assign ff_sc_tdi_o = tdi_i;
+
 /* JTAG dissabled mask */ 
 always @(posedge tck_i or negedge rst_n) begin
   if (~rst_n)
@@ -176,6 +187,7 @@ assign bsc_mode_o    = jtag_enabled_q & ir == EXTEST;
 assign dr_tdo = (ir == IDCODE) ? idcode_q[0] :
 				(ir == SAMPLE_PRELOAD | ir == EXTEST) ? bsc_tdo_i:
 				(ir == USER_REG) ? ureg_data_q[0] :
+				(ir == FF_SCAN) ? ff_sc_tdo_i:
 				bypass_q; 
 
 reg tdo_q;

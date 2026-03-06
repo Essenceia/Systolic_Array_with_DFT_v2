@@ -37,3 +37,6 @@ So I should just add the ff bank, still no use for the SRAM though.
 - [ ] add scan chain interface
 - [ ] add scan chain test for gate sim mode
 
+# CATS
+
+- [ ] bogo cat
