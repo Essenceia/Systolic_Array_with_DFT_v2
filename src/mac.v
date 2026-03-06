@@ -28,11 +28,11 @@ module mac #(
 	 * scan chain doesn't appear in the RTL code as it
 	 * will be added during implementation */
 /* verilator lint_off UNUSEDSIGNAL */
-(* KEEP = "true" *)	input wire          ff_sc_en_i,
-(* KEEP = "true" *)	input wire          ff_sc_tdi_i,
+(* KEEP = "true" *)	input wire ff_sc_en_i,
+(* KEEP = "true" *)	input wire ff_sc_tdi_i,
 /* verilator lint_on UNUSEDSIGNAL */
 /* verilator lint_off UNDRIVEN */
-(* KEEP = "true" *)	output wire         ff_sc_tdo_o,
+(* KEEP = "true" *)	output wire ff_sc_tdo_o,
 /* verilator lint_on UNDRIVEN */
 
 	output wire         result_v_o, 
