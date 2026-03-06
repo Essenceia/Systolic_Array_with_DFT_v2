@@ -145,5 +145,8 @@ mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(
 
 // JTAG user register access
 assign jtag_ureg_data_o = jtag_ureg_data[jtag_ureg_addr_i[3:2]]; 
+
+// DFT 
+assign ff_sc_tdo_o = 1'b0; // placeholder to make yosys error checker happy will be connected by implem
 endmodule
 
