@@ -60,9 +60,9 @@ wire tms;
 wire tdo;
 wire trst; 
 
-wire ff_sc_en;
-wire ff_sc_tdi;
-wire ff_sc_tdo;
+(* dont_touch, keep_hierachy, keep *) wire ff_sc_en;
+(* dont_touch, keep_hierachy, keep *) wire ff_sc_tdi;
+(* dont_touch, keep_hierachy, keep *) wire ff_sc_tdo;
 
 assign bsc_chain[0] = tdi;
 assign bsc_tdo = bsc_chain[BSC_CHAIN_W-1];
