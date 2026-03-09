@@ -24,18 +24,7 @@ module mac #(
 	input wire  [UREG_ADDR-1:0] jtag_ureg_addr_i, 
 	output wire [W-1:0]         jtag_ureg_data_o,
 	
-	/* DFT: FF SCAN CHAIN
-	 * scan chain doesn't appear in the RTL code as it
-	 * will be added during implementation */
-/* verilator lint_off UNUSEDSIGNAL */
-(* KEEP = "true" *)	input wire ff_sc_en_i,
-(* KEEP = "true" *)	input wire ff_sc_tdi_i,
-/* verilator lint_on UNUSEDSIGNAL */
-/* verilator lint_off UNDRIVEN */
-(* KEEP = "true" *)	output wire ff_sc_tdo_o,
-/* verilator lint_on UNDRIVEN */
-
-	output wire         result_v_o, 
+	output wire            result_v_o, 
 	output wire [IO_W-1:0] result_o
 );
 localparam NN = N*N;
@@ -146,7 +135,5 @@ mac_streamout #(.W(W), .OUT_W(IO_W)) m_mac_result_streamout_2x2(
 // JTAG user register access
 assign jtag_ureg_data_o = jtag_ureg_data[jtag_ureg_addr_i[3:2]]; 
 
-// DFT 
-assign ff_sc_tdo_o = 1'b0; // placeholder to make yosys error checker happy will be connected by implem
 endmodule
 

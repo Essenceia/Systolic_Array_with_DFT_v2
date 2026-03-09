@@ -34,9 +34,9 @@ module jtag #(
 	input wire bsc_tdo_i,
 
 	// FF Scan Chain
-	output wire ff_sc_en_o,
-	output wire ff_sc_tdi_o,
-	input wire  ff_sc_tdo_i,
+(* keep, keep_hierarchy *) output wire sc_en_o,
+(* keep, keep_hierarchy *) output wire sc_tdi_o,
+(* keep, keep_hierarchy *) input wire  sc_tdo_i,
 
 	output wire [UREG_ADDR_W-1:0] ureg_addr_o,
 	input wire  [UREG_DATA_W-1:0] ureg_data_i	
@@ -165,8 +165,8 @@ end
 assign ureg_addr_o = ureg_addr_q; 
 
 /* FF_SCAN_CHAIN */
-assign ff_sc_en_o = (ir == FF_SCAN) & (fsm_q == DR_SHIFT);
-assign ff_sc_tdi_o = tdi_i;
+assign sc_en_o = (ir == FF_SCAN) & (fsm_q == DR_SHIFT);
+assign sc_tdi_o = tdi_i;
 
 /* JTAG dissabled mask */ 
 always @(posedge tck_i or negedge rst_n) begin
@@ -187,7 +187,7 @@ assign bsc_mode_o    = jtag_enabled_q & ir == EXTEST;
 assign dr_tdo = (ir == IDCODE) ? idcode_q[0] :
 				(ir == SAMPLE_PRELOAD | ir == EXTEST) ? bsc_tdo_i:
 				(ir == USER_REG) ? ureg_data_q[0] :
-				(ir == FF_SCAN) ? ff_sc_tdo_i:
+				(ir == FF_SCAN) ? sc_tdo_i:
 				bypass_q; 
 
 reg tdo_q;

@@ -60,10 +60,6 @@ wire tms;
 wire tdo;
 wire trst; 
 
-(* dont_touch, keep_hierachy, keep *) wire ff_sc_en;
-(* dont_touch, keep_hierachy, keep *) wire ff_sc_tdi;
-(* dont_touch, keep_hierachy, keep *) wire ff_sc_tdo;
-
 assign bsc_chain[0] = tdi;
 assign bsc_tdo = bsc_chain[BSC_CHAIN_W-1];
 
@@ -115,6 +111,31 @@ assign uio_out[6] = tdo;
 wire [UREG_ADDR_W-1:0] ureg_addr;
 wire [UREG_DATA_W-1:0] ureg_data;
 
+wire ff_sc_en;
+wire ff_sc_tdi;
+wire ff_sc_tdo;
+
+`ifdef SCL_sg13g2_stdcell
+// openroad dft scan chain insertion matches port, not internal nets
+wire ff_sc_en_unusued, ff_sc_tdi_unusued, ff_sc_tdo_unused;
+(* keep *) sg13g2_buf_1 m_ff_sc_en_buf (
+	.A(ff_sc_en),
+	.X(ff_sc_en_unusued)
+);
+assign ff_sc_tdo_unused = 1'bX; 
+(* keep *) sg13g2_buf_1 m_ff_tdo_en_buf (
+	.A(ff_sc_tdo_unused),
+	.X(ff_sc_tdo)
+);
+
+(* keep *) sg13g2_buf_1 m_ff_sc_tdi_buf (
+	.A(ff_sc_tdi),
+	.X(ff_sc_tdi_unusued)
+);
+
+
+`endif
+
 jtag #(.IR_W(3), 
 	.VERSION_NUM(4'h2),// <- v2 second tapeout
 	.PART_NUM(16'hbeef),
@@ -138,9 +159,9 @@ jtag #(.IR_W(3),
 
 	.bsc_tdo_i(bsc_tdo),
 
-	.ff_sc_tdi_o(ff_sc_tdi),
-	.ff_sc_en_o(ff_sc_en),
-	.ff_sc_tdo_i(ff_sc_tdo),
+(* keep, keep_hierarchy *)	.sc_tdi_o(ff_sc_tdi),
+(* keep, keep_hierarchy *)	.sc_en_o(ff_sc_en),
+(* keep, keep_hierarchy *)	.sc_tdo_i(ff_sc_tdo),
 
 	.ureg_addr_o(ureg_addr),
 	.ureg_data_i(ureg_data)
@@ -158,10 +179,6 @@ mac #(.W(W), .IO_W(IO_W), .N(2)) m_2x2_systolic_mac(
 
 	.jtag_ureg_addr_i(ureg_addr),
 	.jtag_ureg_data_o(ureg_data),
-
-	.ff_sc_en_i(ff_sc_en),
-	.ff_sc_tdi_i(ff_sc_tdi),
-	.ff_sc_tdo_o(ff_sc_tdo),
 
 	.result_v_o(result_v),
 	.result_o(result)
