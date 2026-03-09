@@ -1,5 +1,5 @@
 {
-  "PL_TARGET_DENSITY_PCT": 60,
+  "PL_TARGET_DENSITY_PCT": 65,
   "CLOCK_PERIOD": 10,
   "PL_RESIZER_HOLD_SLACK_MARGIN": 0.1,
   "GRT_RESIZER_HOLD_SLACK_MARGIN": 0.05,
@@ -46,6 +46,7 @@
     "dir::bf16/src/bf16_add.v",
     "dir::bf16/src/bf16_mul.v",
     "dir::bf16/src/booth_unsigned_mul.v",
+    "dir::bf16/src/pmux.v",
     "dir::bf16/src/lzc.v"
   ],
   "DIE_AREA": "0 0 419.52 313.74",
@@ -54,5 +55,10 @@
   "GND_PIN": "VGND",
   "RT_MAX_LAYER": "TopMetal1",
   "LINTER_VLT": "dir::../conf/waiver.vlt",
-"LINTER_DISABLE_WARNINGS"    :["DECLFILENAME", "EOFNEWLINE", "TIMESCALEMOD"]
+  "SCRIPTS_DIR":"/home/gp/librelane/librelane/scripts",
+"LINTER_DISABLE_WARNINGS"    :["DECLFILENAME", "EOFNEWLINE", "TIMESCALEMOD"],
+  "JTAG_CLOCK_NAME": "ui_in[0]",
+  "DFT_SCAN_EN_PORT":  "m_jtag_tap.sc_en_o",
+  "DFT_SCAN_TDI_PORT": "m_jtag_tap.sc_tdi_o",
+  "DFT_SCAN_TDO_PORT": "m_jtag_tap.sc_tdo_i"
 }
