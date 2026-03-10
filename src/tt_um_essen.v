@@ -42,7 +42,7 @@ wire bsc_capture;
 wire bsc_update;
 wire bsc_mode; 
 
-(* MARK_DEBUG = "true" *) wire       data_v;
+wire            data_v;
 wire [1:0]      data_mode; 
 wire [IO_W-1:0] data;
 wire            result_v;
@@ -111,29 +111,36 @@ assign uio_out[6] = tdo;
 wire [UREG_ADDR_W-1:0] ureg_addr;
 wire [UREG_DATA_W-1:0] ureg_data;
 
-wire ff_sc_en;
-wire ff_sc_tdi;
-wire ff_sc_tdo;
+// SCANCHAIN
+// connected to the scan chain during implementation 
+/* verilator lint_off UNUSEDSIGNAL */
+/* verilator lint_off UNDRIVEN */
+wire dft_sc_en; 
+wire dft_sc_tdi;
+wire dft_sc_tdo;
+wire jtag_dft_sc_en;
+wire jtag_dft_sc_tdi;
+wire jtag_dft_sc_tdo;
+/* verilator lint_on UNUSEDSIGNAL */
+/* verilator lint_on UNDRIVEN */
 
 `ifdef SCL_sg13g2_stdcell
-// openroad dft scan chain insertion matches port, not internal nets
-wire ff_sc_en_unusued, ff_sc_tdi_unusued, ff_sc_tdo_unused;
-(* keep *) sg13g2_buf_1 m_ff_sc_en_buf (
-	.A(ff_sc_en),
-	.X(ff_sc_en_unusued)
-);
-assign ff_sc_tdo_unused = 1'bX; 
-(* keep *) sg13g2_buf_1 m_ff_sc_tdo_buf (
-	.A(ff_sc_tdo_unused),
-	.X(ff_sc_tdo)
+// openroad dft scan chain insertion matches component port, not internal nets
+(* keep *) sg13g2_buf_1 m_dft_sc_en_buf (
+	.A(jtag_dft_sc_en),
+	.X(dft_sc_en)
 );
 
-(* keep *) sg13g2_buf_1 m_ff_sc_tdi_buf (
-	.A(ff_sc_tdi),
-	.X(ff_sc_tdi_unusued)
+(* keep *) sg13g2_buf_1 m_dft_sc_tdi_buf (
+	.A(jtag_dft_sc_tdi),
+	.X(dft_sc_tdi)
 );
 
-
+assign dft_sc_tdo = 1'bX;// output of the scan chain, not really X 
+(* keep *) sg13g2_buf_1 m_dft_sc_tdo_buf (
+	.A(dft_sc_tdo),
+	.X(jtag_dft_sc_tdo)
+);
 `endif
 
 jtag #(.IR_W(3), 
@@ -159,9 +166,9 @@ jtag #(.IR_W(3),
 
 	.bsc_tdo_i(bsc_tdo),
 
-(* keep, keep_hierarchy *)	.sc_tdi_o(ff_sc_tdi),
-(* keep, keep_hierarchy *)	.sc_en_o(ff_sc_en),
-(* keep, keep_hierarchy *)	.sc_tdo_i(ff_sc_tdo),
+	.sc_tdi_o(jtag_dft_sc_tdi),
+	.sc_en_o (jtag_dft_sc_en),
+	.sc_tdo_i(jtag_dft_sc_tdo),
 
 	.ureg_addr_o(ureg_addr),
 	.ureg_data_i(ureg_data)
