@@ -18,10 +18,17 @@ set jtag_clk_name "jtag_clock"
 create_clock -name main_clock -period 10.0000 -waveform {0.0000 5.0000} [get_ports {clk}]
 create_clock -name $jtag_clk_name -period 500.0000 -waveform {0.0000 250.0000} [get_ports {ui_in[0]}]
 
+#get instance 
+proc print_all_inst_name { } {
+	set i [[ord::get_db_block] getInsts]
+	foreach x $i { puts [$x getName] }
+}
+
+
 set_dft_config -max_chains 1 -clock_mixing no_mix \
--scan_enable_name_pattern {m_sce_buff} \
--scan_in_name_pattern {m_sci_buff} \
--scan_out_name_pattern {m_sco_buff}  
+-scan_enable_name_pattern {m_ff_sc_en_buf/X} \
+-scan_in_name_pattern {m_ff_sc_tdi_buf/X} \
+-scan_out_name_pattern {m_ff_sc_tdo_buf/A}  
 
 set existing_dont_touch [report_dont_touch]
 

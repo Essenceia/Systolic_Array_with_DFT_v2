@@ -123,7 +123,7 @@ wire ff_sc_en_unusued, ff_sc_tdi_unusued, ff_sc_tdo_unused;
 	.X(ff_sc_en_unusued)
 );
 assign ff_sc_tdo_unused = 1'bX; 
-(* keep *) sg13g2_buf_1 m_ff_tdo_en_buf (
+(* keep *) sg13g2_buf_1 m_ff_sc_tdo_buf (
 	.A(ff_sc_tdo_unused),
 	.X(ff_sc_tdo)
 );

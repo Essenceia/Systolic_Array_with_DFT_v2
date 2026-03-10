@@ -37,10 +37,6 @@ proc add_scan_chain { } {
 
 }
 
-proc count_scan_chains { block } {
-	set dft [$block getDft]
-}
-
 proc write_scan_chain_translate { filename block } {
 	set csv_out [open "$filename" "w"]
 	set dft [$block getDft]
