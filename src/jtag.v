@@ -34,9 +34,9 @@ module jtag #(
 	input wire bsc_tdo_i,
 
 	// FF Scan Chain
-(* keep, keep_hierarchy *) output wire sc_en_o,
-(* keep, keep_hierarchy *) output wire sc_tdi_o,
-(* keep, keep_hierarchy *) input wire  sc_tdo_i,
+    output wire sc_en_o,
+    output wire sc_tdi_o,
+    input wire  sc_tdo_i,
 
 	output wire [UREG_ADDR_W-1:0] ureg_addr_o,
 	input wire  [UREG_DATA_W-1:0] ureg_data_i	
