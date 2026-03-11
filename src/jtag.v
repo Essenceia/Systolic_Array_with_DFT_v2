@@ -50,7 +50,7 @@ localparam [IR_W-1:0] EXTEST         = {IR_W{1'b0}};// 0 - spec defined
 localparam [IR_W-1:0] IDCODE         = {{IR_W-1{1'b0}}, 1'b1}; // 1
 localparam [IR_W-1:0] SAMPLE_PRELOAD = {{IR_W-2{1'b0}}, 2'd2}; // 2
 localparam [IR_W-1:0] USER_REG       = {{IR_W-2{1'b0}}, 2'd3}; // 3
-localparam [IR_W-1:0] FF_SCAN        = 3'd4;                   // 4
+localparam [IR_W-1:0] SCAN_CHAIN     = 3'd4;                   // 4
 /* verilator lint_off UNUSEDPARAM */
 localparam [IR_W-1:0] BYPASS         = {IR_W{1'b1}};         // max
 /* verilator lint_on UNUSEDPARAM */
@@ -164,8 +164,8 @@ always @(posedge tck_i) begin
 end
 assign ureg_addr_o = ureg_addr_q; 
 
-/* FF_SCAN_CHAIN */
-assign sc_en_o = (ir == FF_SCAN) & (fsm_q == DR_SHIFT);
+/* SCAN_CHAIN_CHAIN */
+assign sc_en_o = (ir == SCAN_CHAIN) & (fsm_q == DR_SHIFT);
 assign sc_tdi_o = tdi_i;
 
 /* JTAG dissabled mask */ 
@@ -187,7 +187,7 @@ assign bsc_mode_o    = jtag_enabled_q & ir == EXTEST;
 assign dr_tdo = (ir == IDCODE) ? idcode_q[0] :
 				(ir == SAMPLE_PRELOAD | ir == EXTEST) ? bsc_tdo_i:
 				(ir == USER_REG) ? ureg_data_q[0] :
-				(ir == FF_SCAN) ? sc_tdo_i:
+				(ir == SCAN_CHAIN) ? sc_tdo_i:
 				bypass_q; 
 
 reg tdo_q;
