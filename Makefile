@@ -77,7 +77,7 @@ lint_fpga: $(fpga_deps)
 # copy the result of the lattest librelane run results into the gate directory
 # used for gate level simulation and debug tooling, will be tracked by git
 LIBRELANE_RUN_PATH:=$(SRC_DIR)/runs
-LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final | tail -n 1))
+LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final | sort | tail -n 1))
 
 ifneq ($(LIBRELANE_FINAL),)
 gates:
