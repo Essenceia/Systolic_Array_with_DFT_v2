@@ -44,6 +44,11 @@
   "RUN_POST_CTS_RESIZER_TIMING": "True", 
   "RUN_POST_GRT_RESIZER_TIMING": "True",
   
+  "//": "Custom librelane configs",
+  "JTAG_CLOCK_NAME": "ui_in[0]",
+  "DFT_SCAN_EN_PORT":  "m_dft_sc_en_buf/X",
+  "DFT_SCAN_TDI_PORT": "m_dft_sc_tdi_buf/X",
+  "DFT_SCAN_TDO_PORT": "m_dft_sc_tdo_buf/A",
 
   "LINTER_DISABLE_WARNINGS"	:["DECLFILENAME", "EOFNEWLINE", "TIMESCALEMOD"],
   "LINTER_VLT": "dir::../conf/waiver.vlt",
