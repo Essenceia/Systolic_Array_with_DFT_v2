@@ -19,6 +19,8 @@ VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_LIB_DIR)/*.v)
 
 else
 
+# WHY ARE WE CALLING THE SIM CVC WHEN WE ARE USING CVC64 AAAAAAHHHH
+SIM=cvc
 # Gate level simulation:
 SIM_BUILD		= sim_build/gl
 COMPILE_ARGS    += -DGL_TEST
