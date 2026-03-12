@@ -82,6 +82,7 @@ LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final 
 ifneq ($(LIBRELANE_FINAL),)
 gates:
 	cp $(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v $(IMPLEM_DIR)/.
+	cp $(LIBRELANE_FINAL)/pnl/$(PROJET_NAME).pnl.v $(IMPLEM_DIR)/.
 def:
 	cp $(LIBRELANE_FINAL)/def/$(PROJET_NAME).def $(IMPLEM_DIR)/.
 else
