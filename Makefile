@@ -11,6 +11,7 @@ $(info Using simulator: $(SIM))
 ###########
 
 # Global configs.
+PROJET_NAME := tt_um_essen
 FPGA_DIR := fpga
 SW_DIR := firmware
 TB_DIR := test
@@ -22,8 +23,9 @@ DEBUG_FLAG := $(if $(debug), debug=1)
 DEFINES := $(if $(wave),wave=1)
 WAIVER_FILE := waiver.vlt
 FPGA_LIB:= lib
+IMPLEM_DIR := final
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates def
 
 ########
 # Lint #
@@ -63,11 +65,35 @@ entry_deps := $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_SRC_DIR)/*.v)
 fpga_deps := $(entry_deps) $(wildcard $(FPGA_DIR)/*.v)
 
 lint: $(entry_deps)
-	$(call LINT,$^,tt_um_essen)
+	$(call LINT,$^,$(PROJET_NAME))
 
 lint_fpga: $(fpga_deps)
 	$(call LINT,$^,emulator)
- 
+
+
+############################
+# Implementation artifacts #
+############################
+# copy the result of the lattest librelane run results into the gate directory
+# used for gate level simulation and debug tooling, will be tracked by git
+LIBRELANE_RUN_PATH:=$(SRC_DIR)/runs
+LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final | tail -n 1))
+
+ifneq ($(LIBRELANE_FINAL),)
+# have final folders
+
+gates:
+	cp $(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v $(IMPLEM_DIR)/.
+def:
+	cp $(LIBRELANE_FINAL)/def/$(PROJET_NAME).def $(IMPLEM_DIR)/.
+
+else
+	#don't have build, not a machine on which I am running implementation
+gates:
+def:
+
+endif
+
 #############
 # Testbench #
 #############
