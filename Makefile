@@ -80,18 +80,14 @@ LIBRELANE_RUN_PATH:=$(SRC_DIR)/runs
 LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final | tail -n 1))
 
 ifneq ($(LIBRELANE_FINAL),)
-# have final folders
-
 gates:
 	cp $(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v $(IMPLEM_DIR)/.
 def:
 	cp $(LIBRELANE_FINAL)/def/$(PROJET_NAME).def $(IMPLEM_DIR)/.
-
 else
-	#don't have build, not a machine on which I am running implementation
+# don't have an implem run, not a machine on which I am running implementation
 gates:
 def:
-
 endif
 
 #############
@@ -99,7 +95,11 @@ endif
 #############
 # Call cocotb
 test:
-	$(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) COCOTB_LOG_LEVEL=$(if $(debug),DEBUG,INFO)
+	COCOTB_LOG_LEVEL=$(if $(debug),DEBUG,INFO) $(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) 
+
+test_gates: gates
+	COCOTB_LOG_LEVEL=$(if $(debug),DEBUG,INFO) GATES=yes $(MAKE) -C $(TB_DIR) $(if $(wave),WAVES=1) 
+
 
 waves: 
 	gtkwave $(TB_DIR)/tb.vcd $(CONF)/tb.gtkw &
