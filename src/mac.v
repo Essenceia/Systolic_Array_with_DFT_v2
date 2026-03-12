@@ -62,7 +62,7 @@ generate
 endgenerate
 
 /* Steamin data */ 
-mac_streamin #(.IN_W(IO_W), .W(W)) m_mac_data_steamin_2x2(
+mac_streamin #(.IN_W(IO_W), .W(W)) m_mac_data_streamin_2x2(
 	.clk(clk),
 	.data_i(data_i),
 	.data_wr_v_i(wr_data_v),
