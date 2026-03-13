@@ -11,6 +11,10 @@ PROJECT_SOURCES =
 
 COMPILE_ARGS        += -DCOCOTB
 
+ifeq ($(HOSTNAME),superpitch)
+PDK_ROOT=/home/$(USER)/pdk_root
+endif
+
 ifneq ($(GATES),yes)
 
 # RTL simulation:
