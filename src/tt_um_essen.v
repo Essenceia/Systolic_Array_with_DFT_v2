@@ -40,7 +40,7 @@ wire bsc_tdo;
 wire bsc_shift;
 wire bsc_capture;
 wire bsc_update;
-wire bsc_mode; 
+(* KEEP = "true", dont_touch = "true" *) wire bsc_mode; 
 
 wire            data_v;
 wire [1:0]      data_mode; 
