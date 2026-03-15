@@ -11,8 +11,10 @@ PROJECT_SOURCES =
 
 COMPILE_ARGS        += -DCOCOTB
 
-ifeq ($(HOSTNAME),superpitch)
-PDK_ROOT=/home/$(USER)/pdk_root
+HOSTNAME=$(shell hostname)
+$(info $(HOSTNAME)) 
+ifeq ($(HOSTNAME),superpitchu)
+PDK_ROOT=/home/$(USER)/rtl/pdk/IHP-Open-PDK/
 endif
 
 ifneq ($(GATES),yes)
@@ -22,20 +24,19 @@ SIM_BUILD	 	= sim_build/rtl
 VERILOG_SOURCES += $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_LIB_DIR)/*.v)
 
 else
-
-# WHY ARE WE CALLING THE SIM CVC WHEN WE ARE USING CVC64 AAAAAAHHHH
-SIM=cvc
 # Gate level simulation:
-SIM_BUILD		= sim_build/gl
-COMPILE_ARGS    += -DGL_TEST
+SIM_BUILD		= sim_build/gl_cvc
 COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DSIM
-VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_io/verilog/sg13g2_io.v
 VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v
-
-# lattest gate level netlist is to be placed in the artifact folder
 VERILOG_SOURCES += ../final/tt_um_essen.nl.v
-
+ifeq ($(SIM),cvc)
+# WHY ARE WE CALLING THE SIM CVC WHEN WE ARE USING CVC64 AAAAAAHHHH
+SIM_BUILD		= sim_build/gl
+COMPILE_ARGS    += -DSDF
+else
+SIM_BUILD		= sim_build/gl_iverilog
+endif
 endif
 
 # Allow sharing configuration between design and testbench via `include`

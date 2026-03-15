@@ -1,5 +1,5 @@
 `default_nettype none
-`timescale 1ns / 1ps
+`timescale 1ns / 10ps
 
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
@@ -8,6 +8,9 @@ module tb ();
 
   // Dump the signals to a VCD file. You can view it with gtkwave or surfer.
   initial begin
+`ifdef SDF
+	$sdf_annotate("../final/tt_um_essen__nom_typ_1p20V_25C.sdf", m_dut);
+`endif
     $dumpfile("tb.vcd");
     $dumpvars(0, tb);
     #1;
