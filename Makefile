@@ -25,7 +25,7 @@ WAIVER_FILE := waiver.vlt
 FPGA_LIB:= lib
 IMPLEM_DIR := final
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates def
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates sdf def
 
 ########
 # Lint #
@@ -83,11 +83,14 @@ ifneq ($(LIBRELANE_FINAL),)
 gates:
 	cp $(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v $(IMPLEM_DIR)/.
 	cp $(LIBRELANE_FINAL)/pnl/$(PROJET_NAME).pnl.v $(IMPLEM_DIR)/.
+sdf:
+	cp $(LIBRELANE_FINAL)/sdf/nom_typ_1p20V_25C/* $(IMPLEM_DIR)/.
 def:
 	cp $(LIBRELANE_FINAL)/def/$(PROJET_NAME).def $(IMPLEM_DIR)/.
 else
 # don't have an implem run, not a machine on which I am running implementation
 gates:
+sdf:
 def:
 endif
 
