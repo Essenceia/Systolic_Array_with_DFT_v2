@@ -2,17 +2,15 @@
 #include "hardware/dma.h"
 #include <string.h> 
 #include <stdlib.h>
+#include "bus_protocol.h" 
 
 void send_data_rst(pinout_t *p, size_t pl, uint dma_chan, PIO pio, uint sm){
-	const size_t rl = 2;
+	const size_t rl = 1;
 	hard_assert(p);
 	hard_assert(pl >= rl );
 	memset(p, 0, sizeof(pinout_t)*rl);
-	for(uint i=0; i < rl; i++){
-		p[i].valid_i = 1; 
-		p[i].data_mode_i = i;
-		p[i].data_rst_addr_i = 1;
-	} 
+	p[0].valid_i = 1; 
+	p[0].data_mode_i = CTRL_WR_MODE_RST;
 	start_wr_dma_pinout_stream(p, rl, dma_chan, pio, sm);
 }
 
@@ -26,7 +24,7 @@ void data_to_pinout(data_t *c, bool is_weight, pinout_t *p, size_t pl)
 	{
 		p[i].data_i = c->data[i];
 		p[i].valid_i = 1; 
-		p[i].data_mode_i = is_weight? CTRL_DATA_MODE_WEIGHT: CTRL_DATA_MODE_DATA;
+		p[i].data_mode_i = is_weight? CTRL_WR_MODE_WEIGHT: CTRL_WR_MODE_DATA;
 	}
 }
 

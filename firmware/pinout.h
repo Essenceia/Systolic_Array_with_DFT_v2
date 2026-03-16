@@ -2,12 +2,14 @@
 #define _PINNOUT_H
 
 /* define pinnout to FPGA emulation */ 
+#define DATA_W        8
+#define DATA_WR_BASE_PIN 0 
+#define DATA_RD_BASE_PIN  8
+#define CTRL_WR_VALID_PIN 16
+#define CTRL_WR_MODE_PIN  17
+#define CTRL_RD_VALID_PIN 26
 #define BUS_CLK_PIN 28
 
-#define DATA_W        8
-#define DATA_BASE_PIN 0 
-#define RES_BASE_PIN  8
-#define CTRL_BASE_PIN 16
 
 typedef struct __attribute__((packed)) {
 	uint8_t data_i;
@@ -24,21 +26,10 @@ typedef struct __attribute__((packed)) {
 
 _Static_assert(sizeof(pinout_t) == (32/8));
 
-/* data */ 
-#define DATA_MASK (uint32_t) 0xFF
-
-/* data ctrl */
-#define CTRL_DATA_W 3
+/* protocol fields mask, wiring specific */ 
+#define DATA_MASK      (uint32_t) 0xFF
 #define CTRL_DATA_MASK (uint32_t) 0x7
-#define CTRL_DATA_BASE_PIN CTRL_BASE_PIN
-#define CTRL_VALID_PIN CTRL_DATA_BASE_PIN 
-#define CTRL_MODE_PIN  CTRL_DATA_BASE_PIN+1
 
-#define CTRL_RES_VALID_PIN 26
 
-#define CTRL_DATA_MODE_WEIGHT 0x0
-#define CTRL_DATA_MODE_DATA   0x1
-#define CTRL_DATA_MODE_RST    0x2
-#define CTRL_DATA_MODE_ASM    0x3
 
 #endif //_PINNOUT_H
