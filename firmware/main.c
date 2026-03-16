@@ -55,10 +55,10 @@ int main() {
 	uint8_t res_buffer[4*DATA_W];
     uint8_t res[DATA_W];
 	data_t *d = (data_t*) malloc(sizeof(data_t));
-	d->data.bf[0] = 0.0;
-	d->data.bf[1] = 1.0;
-	d->data.bf[2] = 2.0;
-	d->data.bf[3] = 3.0;
+	d->bf[0] = f32_to_bf16(0.0);
+	d->bf[1] = f32_to_bf16(1.0);
+	d->bf[2] = f32_to_bf16(2.0);
+	d->bf[3] = f32_to_bf16(3.0);
 	
 	size_t pl = DATA_W;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));

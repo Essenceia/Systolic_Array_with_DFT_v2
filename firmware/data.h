@@ -10,7 +10,7 @@
 #define NN 4
 
 #define DATA_TYPE bfloat16_t 
-#define DATA_W (size_t) sizeof((DATA_TYPE)*NN)
+#define DATA_W (size_t) (sizeof(DATA_TYPE)*(size_t)NN)
 
 typedef union __attribute__((packed)) {
 	bfloat16_t bf[NN];

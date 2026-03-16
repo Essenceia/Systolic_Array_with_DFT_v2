@@ -22,7 +22,7 @@ void data_to_pinout(data_t *c, bool is_weight, pinout_t *p, size_t pl)
 	memset(p, 0, sizeof(pinout_t)*DATA_W);
 	for(uint i=0; i < DATA_W; i++)
 	{
-		p[i].data_i = c->data.u[i];
+		p[i].data_i = c->u[i];
 		p[i].valid_i = 1; 
 		p[i].data_mode_i = is_weight? CTRL_WR_MODE_WEIGHT: CTRL_WR_MODE_DATA;
 	}
