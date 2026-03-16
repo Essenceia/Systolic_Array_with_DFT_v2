@@ -17,6 +17,6 @@ typedef union __attribute__((packed)) {
 	uint8_t u[2*NN];
 } data_t;
 
-static_assert(sizeof(data_t) == 2*NN);
+_Static_assert(sizeof(data_t) == 2*NN);
 
 #endif // _DATA_H

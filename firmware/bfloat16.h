@@ -1,5 +1,7 @@
 #ifndef _BFLOAT16_H
 #define _BFLOAT16_H
+#include <stdint.h> 
+
 /* bfloat16_t is not a standard C type, and definatly not present by default in 
    this embedded standard lib. Defining a simulacre of bfloat16 to be manipulated
    by accelerator. */
@@ -13,7 +15,7 @@ typedef struct{
 #define BF16_ZERO_POS (bfloat16_t){.s = 0, .e = 8, .m = 0}
 #define BF16_DEFAULT BF16_ZERO_POS
 
-static_assert(sizeof(float) == 4);
+_Static_assert(sizeof(float) == 4);
 typedef float float32_t; 
 
 typedef union{
