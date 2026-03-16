@@ -33,11 +33,12 @@ _Static_assert(sizeof(pinout_t) == (32/8));
 #define CTRL_DATA_BASE_PIN CTRL_BASE_PIN
 #define CTRL_VALID_PIN CTRL_DATA_BASE_PIN 
 #define CTRL_MODE_PIN  CTRL_DATA_BASE_PIN+1
-#define CTRL_RST_PIN   CTRL_DATA_BASE_PIN+2
 
 #define CTRL_RES_VALID_PIN 26
 
 #define CTRL_DATA_MODE_WEIGHT 0x0
 #define CTRL_DATA_MODE_DATA   0x1
+#define CTRL_DATA_MODE_RST    0x2
+#define CTRL_DATA_MODE_ASM    0x3
 
 #endif //_PINNOUT_H

@@ -63,6 +63,9 @@ int main() {
 	size_t pl = NN;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));
 
+	bfloat16_t a = {.s=0, .e=0, .m=0};
+	printf("bfloat %d", a.e);
+
 	/* debug */
 	pio_hw_t * debug_pio = PIO_INSTANCE(1);
 	dma_debug_hw_t *debug_dma = dma_debug_hw;

@@ -4,14 +4,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pio.h"
 #include "pinout.h"
-
-// TPU matrix dimentions
-#define N 2
-#define NN 4
-
-typedef struct __attribute__((packed)) {
-	uint8_t data[NN];
-} data_t;
+#include "data.h" 
 
 void send_data_rst(pinout_t *p, size_t pl, uint dma_chan, PIO pio, uint sm);
 
