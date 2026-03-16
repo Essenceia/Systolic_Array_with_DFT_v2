@@ -32,10 +32,10 @@ VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2
 VERILOG_SOURCES += ../final/tt_um_essen.nl.v
 ifeq ($(SIM),cvc)
 # WHY ARE WE CALLING THE SIM CVC WHEN WE ARE USING CVC64 AAAAAAHHHH
-SIM_BUILD		= sim_build/gl
+SIM_BUILD		= sim_build/gl_cvc
 COMPILE_ARGS    += -DSDF
 else
-SIM_BUILD		= sim_build/gl_iverilog
+SIM_BUILD		= sim_build/gl
 endif
 endif
 
