@@ -38,30 +38,30 @@ static inline void data_wr_program_init(PIO pio, uint sm, uint offset, float fdi
 
 	// set "set" instruction base pin offset to ctrl bit to overcome the 
 	// 5b wide wright limitation
-	_Static_assert(CTRL_BASE_PIN+5 > CTRL_VALID_PIN);
-	sm_config_set_set_pins(&c, CTRL_VALID_PIN, 3);
+	_Static_assert(CTRL_WR_BASE_PIN+5 > CTRL_WR_VALID_PIN);
+	sm_config_set_set_pins(&c, CTRL_WR_BASE_PIN, 3);
 
 	// set config
 	pio_sm_init(pio, sm, offset, &c); 
 
 	// enable pins, connect to pio
-	for(i=DATA_BASE_PIN; i < DATA_BASE_PIN + DATA_W; i++){ // data
+	for(i=DATA_WR_BASE_PIN; i < DATA_WR_BASE_PIN + DATA_W; i++){ // data
 		pio_gpio_init(pio, i);
 		gpio_set_drive_strength(i, GPIO_DRIVE_STRENGTH_12MA);
 		gpio_set_slew_rate(i, GPIO_SLEW_RATE_FAST);
 		gpio_set_pulls(i, false, true);
 	}
-	pindirs |= DATA_MASK << DATA_BASE_PIN;
-	pinmask |= DATA_MASK << DATA_BASE_PIN;
+	pindirs |= DATA_MASK << DATA_WR_BASE_PIN;
+	pinmask |= DATA_MASK << DATA_WR_BASE_PIN;
 
-	for(i=CTRL_DATA_BASE_PIN; i < CTRL_DATA_BASE_PIN + CTRL_DATA_W; i++){ // ctrl data
+	for(i=CTRL_WR_BASE_PIN; i < CTRL_WR_BASE_PIN + CTRL_WR_W; i++){ // ctrl data
 		pio_gpio_init(pio, i);
 		gpio_set_drive_strength(i, GPIO_DRIVE_STRENGTH_12MA);
 		gpio_set_slew_rate(i, GPIO_SLEW_RATE_FAST);
 		gpio_set_pulls(i, false, true);
 	}
-	pinmask |= CTRL_DATA_MASK << CTRL_DATA_BASE_PIN;
-	pindirs |= CTRL_DATA_MASK << CTRL_DATA_BASE_PIN;
+	pinmask |= CTRL_WR_MASK << CTRL_WR_BASE_PIN;
+	pindirs |= CTRL_WR_MASK << CTRL_WR_BASE_PIN;
 
 	pio_sm_set_pindirs_with_mask(pio, sm, pindirs, pinmask); 
 	

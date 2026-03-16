@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "pinout.h" 
+#include "bus_protocol.h"
+#include "bfloat16.h"
+#include "data.h" 
 
 #include "hardware/clocks.h"
 
@@ -21,7 +25,6 @@
 #include "hardware/structs/pio.h"
 #include "hardware/structs/sio.h"
 
-#include "bfloat16.h"
 
 #define DELAY_MS 200
 

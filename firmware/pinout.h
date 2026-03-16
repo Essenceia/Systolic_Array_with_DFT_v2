@@ -5,6 +5,7 @@
 #define BUS_DATA_W        8
 #define DATA_WR_BASE_PIN  0 
 #define DATA_RD_BASE_PIN  8
+#define CTRL_WR_BASE_PIN  16
 #define CTRL_WR_VALID_PIN 16
 #define CTRL_WR_MODE_PIN  17
 #define CTRL_RD_VALID_PIN 26
@@ -23,10 +24,6 @@ typedef struct __attribute__((packed)) {
 } pinout_t;
 
 _Static_assert(sizeof(pinout_t) == (32/8));
-
-/* protocol fields mask, wiring specific */ 
-#define DATA_MASK      (uint32_t) 0xFF
-#define CTRL_DATA_MASK (uint32_t) 0x7
 
 
 

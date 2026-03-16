@@ -10,4 +10,9 @@
 #define CTRL_WR_MODE_RST    0x2
 #define CTRL_WR_MODE_ASM    0x3
 
+/* protocol fields mask */ 
+#define DATA_MASK      (uint32_t) 0xFF
+#define CTRL_WR_MASK (uint32_t) 0x7
+
+
 #endif // _BUS_PROTOCOL_H
