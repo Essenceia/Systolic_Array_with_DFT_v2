@@ -21,6 +21,7 @@
 #include "hardware/structs/pio.h"
 #include "hardware/structs/sio.h"
 
+#include "bfloat16.h"
 
 #define DELAY_MS 200
 

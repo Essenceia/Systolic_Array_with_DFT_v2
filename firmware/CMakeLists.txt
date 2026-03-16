@@ -25,6 +25,7 @@ target_sources(${project_name} PRIVATE ${c_code_src})
 
 target_link_libraries(${project_name}
 	pico_stdlib
+	pico_float_compiler
 	hardware_pio
 	hardware_clocks
 	hardware_timer
@@ -37,3 +38,8 @@ pico_enable_stdio_usb(${project_name} 1)
 pico_enable_stdio_uart(${project_name} 0)
 
 pico_add_extra_outputs(${project_name})
+
+# floating point compiler support
+pico_set_float_implementation(${project_name} "compiler")
+
+
