@@ -2,8 +2,7 @@
 #define _BUS_PROTOCOL_H
 /* common bus protocol defines */
 
-/* data ctrl */
-{ valid: 1b, mode: 2b }
+/* data ctrl { valid: 1b, mode: 2b }*/
 #define CTRL_WR_W 3
 
 #define CTRL_WR_MODE_WEIGHT 0x0
