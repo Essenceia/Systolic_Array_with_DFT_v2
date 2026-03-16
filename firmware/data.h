@@ -9,9 +9,14 @@
 #define N 2
 #define NN 4
 
-typedef struct __attribute__((packed)) {
-	bfloat16_t data[NN];
+#define DATA_TYPE bfloat16_t 
+#define DATA_W (size_t) sizeof((DATA_TYPE)*NN)
+
+typedef union __attribute__((packed)) {
+	bfloat16_t bf[NN];
+	uint8_t u[2*NN];
 } data_t;
 
+static_assert(sizeof(data_t) == 2*NN);
 
 #endif // _DATA_H

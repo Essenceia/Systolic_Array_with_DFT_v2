@@ -18,11 +18,11 @@ void send_data_rst(pinout_t *p, size_t pl, uint dma_chan, PIO pio, uint sm){
 void data_to_pinout(data_t *c, bool is_weight, pinout_t *p, size_t pl)
 {
 	hard_assert(p);
-	hard_assert(pl*NN >= sizeof(*c));
-	memset(p, 0, sizeof(pinout_t)*NN);
-	for(uint i=0; i < NN; i++)
+	hard_assert(pl*DATA_W >= sizeof(*c));
+	memset(p, 0, sizeof(pinout_t)*DATA_W);
+	for(uint i=0; i < DATA_W; i++)
 	{
-		p[i].data_i = c->data[i];
+		p[i].data_i = c->data.u[i];
 		p[i].valid_i = 1; 
 		p[i].data_mode_i = is_weight? CTRL_WR_MODE_WEIGHT: CTRL_WR_MODE_DATA;
 	}
@@ -34,7 +34,7 @@ void send_data(data_t *data, bool is_weight,  pinout_t *p, size_t pl, uint dma_c
 	data_to_pinout(data, is_weight, p, pl); 
 
 	//dma_channel_wait_for_finish_blocking(dma_chan); // wait for dma channel to be empty, else will overwrite
-	start_wr_dma_pinout_stream(p, NN, dma_chan, pio, sm);
+	start_wr_dma_pinout_stream(p, DATA_W, dma_chan, pio, sm);
 	/*dma_channel_wait_for_finish_blocking(dma_chan);
 	while(pio_sm_get_tx_fifo_level(pio, sm)!=0){}*/
 }

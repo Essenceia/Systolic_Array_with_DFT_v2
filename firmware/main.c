@@ -52,15 +52,15 @@ int main() {
 	bool s = true; 
 	uint led = 1;
 
-	uint8_t res_buffer[4*NN];
-    uint8_t res[NN];
+	uint8_t res_buffer[4*DATA_W];
+    uint8_t res[DATA_W];
 	data_t *d = (data_t*) malloc(sizeof(data_t));
-	d->data[0] = 0;
-	d->data[1] = 1;
-	d->data[2] = 2;
-	d->data[3] = 3;
+	d->data.bf[0] = 0.0;
+	d->data.bf[1] = 1.0;
+	d->data.bf[2] = 2.0;
+	d->data.bf[3] = 3.0;
 	
-	size_t pl = NN;
+	size_t pl = DATA_W;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));
 
 	bfloat16_t a = {.s=0, .e=0, .m=0};
