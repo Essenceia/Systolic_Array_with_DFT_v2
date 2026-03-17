@@ -103,7 +103,7 @@ bsc #(.W(IO_W)) m_bsc_result_out(
 assign tck        = ui_in[0]; // clk's can only be driven from the ui_in pins
 assign tdi        = uio_in[4];
 assign tms        = uio_in[5];
-assign trst       = ~rst_n | ~ena; // there is no power gating, stall the design if not enabled
+assign trst       = ~rst_n; // there is no power gating, stall the design if not enabled
 assign uio_out[6] = tdo;
 
 
@@ -150,9 +150,6 @@ jtag #(.IR_W(3),
 	.UREG_ADDR_W(UREG_ADDR_W),
 	.UREG_DATA_W(UREG_DATA_W)
 	) m_jtag_tap (
-	.rst_n(rst_n),
-	.ena(ena), 
-
 	.tck_i(tck),
 	.tms_i(tms),
 	.tdi_i(tdi),

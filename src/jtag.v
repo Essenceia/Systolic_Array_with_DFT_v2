@@ -16,9 +16,6 @@ module jtag #(
 	parameter UREG_DATA_W = 8, // user register size
 	parameter UREG_W = (UREG_ADDR_W >= UREG_DATA_W)? UREG_ADDR_W: UREG_DATA_W
 	)(
-	input wire  rst_n,
-	input wire  ena, 
-
 	input wire  tck_i, 
 	input wire  tms_i, 
 	input wire  tdi_i,
@@ -80,7 +77,7 @@ reg  jtag_enabled_q;
 
 /* fsm is reset though the RESET TAP */
 always @(posedge tck_i) begin
-	if (trst_i | ~ena | ~jtag_enabled_q) begin 
+	if (trst_i | ~jtag_enabled_q) begin 
 		fsm_q <= RESET;
 	end else begin // block isn't going to be power gatted
 		case(fsm_q)
@@ -169,8 +166,8 @@ assign sc_en_o = (ir == SCAN_CHAIN) & (fsm_q == DR_SHIFT);
 assign sc_tdi_o = tdi_i;
 
 /* JTAG dissabled mask */ 
-always @(posedge tck_i or negedge rst_n) begin
-  if (~rst_n)
+always @(posedge tck_i or posedge trst_i) begin
+  if (trst_i)
     jtag_enabled_q <= 1'b0;  
   else
     jtag_enabled_q <= 1'b1;
