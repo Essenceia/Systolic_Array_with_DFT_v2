@@ -25,7 +25,7 @@ WAIVER_FILE := waiver.vlt
 FPGA_LIB:= lib
 IMPLEM_DIR := final
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates sdf def
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates sdf def gl
 
 ########
 # Lint #
@@ -93,6 +93,8 @@ gates:
 sdf:
 def:
 endif
+
+gl: gates sdf def 
 
 #############
 # Testbench #
