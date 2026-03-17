@@ -21,52 +21,44 @@ set_property -dict { PACKAGE_PIN P3    IOSTANDARD LVCMOS33 PULLDOWN true } [get_
 set_property -dict { PACKAGE_PIN N3    IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {led_o[13]}]
 set_property -dict { PACKAGE_PIN P1    IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {led_o[14]}]
 set_property -dict { PACKAGE_PIN L1    IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {led_o[15]}]
-#
-#Pmod Header JA
-set_property -dict { PACKAGE_PIN J1   IOSTANDARD LVCMOS33 } [get_ports {res_o[0]}];#Sch name = JA1
-set_property -dict { PACKAGE_PIN L2   IOSTANDARD LVCMOS33 } [get_ports {res_o[1]}];#Sch name = JA2
-set_property -dict { PACKAGE_PIN J2   IOSTANDARD LVCMOS33 } [get_ports {res_o[2]}];#Sch name = JA3
-set_property -dict { PACKAGE_PIN G2   IOSTANDARD LVCMOS33 } [get_ports {res_o[3]}];#Sch name = JA4
-set_property -dict { PACKAGE_PIN H1   IOSTANDARD LVCMOS33 } [get_ports {res_o[4]}];#Sch name = JA7
-set_property -dict { PACKAGE_PIN K2   IOSTANDARD LVCMOS33 } [get_ports {res_o[5]}];#Sch name = JA8
-set_property -dict { PACKAGE_PIN H2   IOSTANDARD LVCMOS33 } [get_ports {res_o[6]}];#Sch name = JA9
-set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {res_o[7]}];#Sch name = JA10
-
-#Pmod Header JB
-set_property -dict { PACKAGE_PIN A14   IOSTANDARD LVCMOS33  } [get_ports {data_v_i}];#Sch name = JB1
-set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33  } [get_ports {data_mode_i}];#Sch name = JB2
-set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33  } [get_ports {data_rst_addr_i}];#Sch name = JB3
-#set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33  } [get_ports {hash_ctrl_o[0]}];#Sch name = JB4
-#set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33  } [get_ports {loopback_ctrl_i[0]}];#Sch name = JB7
-#set_property -dict { PACKAGE_PIN A17   IOSTANDARD LVCMOS33  } [get_ports {loopback_ctrl_i[1]}];#Sch name = JB8
-#set_property -dict { PACKAGE_PIN C15   IOSTANDARD LVCMOS33 } [get_ports {pmodB_io[6]}];#Sch name = JB9
-set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33  } [get_ports {res_v_o}];#Sch name = JB10
-
-#Pmod Header JC
-#set_property -dict { PACKAGE_PIN K17   IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {hash_o[4]}];#Sch name = JC1
-#set_property -dict { PACKAGE_PIN M18   IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {hash_o[5]}];#Sch name = JC2
-#set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {hash_o[6]}];#Sch name = JC3
-#set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {hash_o[7]}];#Sch name = JC4
-
-# clk 
-set_property -dict { PACKAGE_PIN L17  IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {clk_bus_i}];#Sch name = JC7
-create_clock -add -name clk_bus_i -period 25.00 [get_ports clk_bus_i]
-set_property -dict { PACKAGE_PIN K17   IOSTANDARD LVCMOS33  } [get_ports {tdi_i}];#Sch name = JC1
-set_property -dict { PACKAGE_PIN M18  IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {tck_i}];#Sch name = JC2
-create_clock -add -name tck_i -period 500.00 [get_ports tck_i]
-set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33  } [get_ports {tms_i}];#Sch name = JC3
-set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33  } [get_ports {tdo_o}];#Sch name = JC4
-
 
 #Pmod Header JD - JADX
-set_property -dict { PACKAGE_PIN J3   IOSTANDARD LVCMOS33  } [get_ports {data_i[0]}];#Sch name = XA1_P
-set_property -dict { PACKAGE_PIN L3   IOSTANDARD LVCMOS33  } [get_ports {data_i[1]}];#Sch name = XA2_P
-set_property -dict { PACKAGE_PIN M2   IOSTANDARD LVCMOS33  } [get_ports {data_i[2]}];#Sch name = XA3_P
-set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVCMOS33  } [get_ports {data_i[3]}];#Sch name = XA4_P
-set_property -dict { PACKAGE_PIN K3   IOSTANDARD LVCMOS33  } [get_ports {data_i[4]}];#Sch name = XA1_N
-set_property -dict { PACKAGE_PIN M3   IOSTANDARD LVCMOS33  } [get_ports {data_i[5]}];#Sch name = XA2_N
-set_property -dict { PACKAGE_PIN M1   IOSTANDARD LVCMOS33  } [get_ports {data_i[6]}];#Sch name = XA3_N
-set_property -dict { PACKAGE_PIN N1   IOSTANDARD LVCMOS33  } [get_ports {data_i[7]}];#Sch name = XA4_N
+set_property -dict { PACKAGE_PIN J3   IOSTANDARD LVCMOS33  } [get_ports {data_i[0]}];
+set_property -dict { PACKAGE_PIN L3   IOSTANDARD LVCMOS33  } [get_ports {data_i[1]}];
+set_property -dict { PACKAGE_PIN M2   IOSTANDARD LVCMOS33  } [get_ports {data_i[2]}];
+set_property -dict { PACKAGE_PIN N2   IOSTANDARD LVCMOS33  } [get_ports {data_i[3]}];
+set_property -dict { PACKAGE_PIN K3   IOSTANDARD LVCMOS33  } [get_ports {data_i[4]}];
+set_property -dict { PACKAGE_PIN M3   IOSTANDARD LVCMOS33  } [get_ports {data_i[5]}];
+set_property -dict { PACKAGE_PIN M1   IOSTANDARD LVCMOS33  } [get_ports {data_i[6]}];
+set_property -dict { PACKAGE_PIN N1   IOSTANDARD LVCMOS33  } [get_ports {data_i[7]}];
+
+#Pmod Header JA
+set_property -dict { PACKAGE_PIN J1   IOSTANDARD LVCMOS33 } [get_ports {res_o[0]}];
+set_property -dict { PACKAGE_PIN L2   IOSTANDARD LVCMOS33 } [get_ports {res_o[1]}];
+set_property -dict { PACKAGE_PIN J2   IOSTANDARD LVCMOS33 } [get_ports {res_o[2]}];
+set_property -dict { PACKAGE_PIN G2   IOSTANDARD LVCMOS33 } [get_ports {res_o[3]}];
+set_property -dict { PACKAGE_PIN H1   IOSTANDARD LVCMOS33 } [get_ports {res_o[4]}];
+set_property -dict { PACKAGE_PIN K2   IOSTANDARD LVCMOS33 } [get_ports {res_o[5]}];
+set_property -dict { PACKAGE_PIN H2   IOSTANDARD LVCMOS33 } [get_ports {res_o[6]}];
+set_property -dict { PACKAGE_PIN G3   IOSTANDARD LVCMOS33 } [get_ports {res_o[7]}];
+
+#Pmod Header JB
+set_property -dict { PACKAGE_PIN A14   IOSTANDARD LVCMOS33  } [get_ports {data_v_i}];
+set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33  } [get_ports {data_mode_i[0]}];
+set_property -dict { PACKAGE_PIN B15   IOSTANDARD LVCMOS33  } [get_ports {data_mode_i[1]}];
+set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33  } [get_ports {res_v_o}];
+
+# Pmod Header JC
+# jtag
+set_property -dict { PACKAGE_PIN K17   IOSTANDARD LVCMOS33  } [get_ports {tdi_i}];
+set_property -dict { PACKAGE_PIN M18  IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {tck_i}];
+create_clock -add -name tck_i -period 500.00 [get_ports tck_i]
+set_property -dict { PACKAGE_PIN N17   IOSTANDARD LVCMOS33  } [get_ports {tms_i}];
+set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33  } [get_ports {tdo_o}];
+# clk 
+set_property -dict { PACKAGE_PIN L17  IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {clk_bus_i}];
+create_clock -add -name clk_bus_i -period 25.00 [get_ports clk_bus_i]
+
 
 # tie unused pins
 set_property -dict { PACKAGE_PIN W7   IOSTANDARD LVCMOS33 } [get_ports {unused_o[0]}]
