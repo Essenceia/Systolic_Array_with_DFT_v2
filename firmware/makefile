@@ -4,7 +4,7 @@ SRC:=$(wildcard *.c) $(wildcard *.h) $(wildcard *.pio)
 
 # GDB server config, if variable is not defined when calling `make gdb` use localhost as default
 #ifndef GDB_SERVER_ADDR
-GDB_SERVER_ADDR:=localhost
+GDB_SERVER_ADDR:=192.168.0.120
 #endif
 
 GDB_SERVER_PORT:=3333
