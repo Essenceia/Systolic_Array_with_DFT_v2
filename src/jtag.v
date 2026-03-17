@@ -191,7 +191,6 @@ reg tdo_q;
 always @(posedge tck_i) begin
 	tdo_q <= (fsm_q == IR_SHIFT)? ir_tdo: 
          	 dr_tdo;
-
 end
 assign tdo_o = tdo_q;
 endmodule

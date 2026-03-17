@@ -20,9 +20,6 @@ setup: ${BUILD_DIR}
 build: setup ${SRC}
 	PROJECT_NAME=${PROJECT_NAME} cmake --build ${BUILD_DIR} --target ${PROJECT_NAME}
 	
-flash:
-	sudo cp ${BUILD_DIR}/${PROJECT_NAME}.uf2 /mnt/rpi
-
 # using default baudrate
 serial:
 	picocom -q /dev/ttyACM0

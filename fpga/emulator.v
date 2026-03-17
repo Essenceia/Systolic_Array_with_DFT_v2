@@ -122,9 +122,12 @@ assign led_o[0] = rst_async;
 assign led_o[1] = ena;
 assign led_o[2] = clk_ibuf; 
 assign led_o[10:3] = data_q;
-assign led_o[11]    = tck;
-assign led_o[12]    = tdi;
-assign led_o[13]    = tms;
+
+assign led_o[11]    = 1'b1; // seperator
+
+assign led_o[12]    = tck;
+assign led_o[13]    = tdi;
+assign led_o[14]    = tms;
 assign led_o[15]    = tdo;
 
 assign unused_o = {4'h0, 1'b1, {7{1'b1}}}; // an, dp, seg
