@@ -37,7 +37,6 @@ wire pll_lock;
 reg  pll_lock_q;
 wire ena;
 wire rst_async;
-reg rst_n_q, rst_n_d1_q;
 wire error;
  
 wire [7:0] ui_in;
@@ -123,7 +122,7 @@ assign res_o = res_bus_d2_q;
 assign res_v_o = res_v_bus_d2_q;
 
 /* debug leds */
-assign led_o[0] = rst_n_d1_q;
+assign led_o[0] = rst_async;
 assign led_o[1] = ena;
 assign led_o[2] = clk_ibuf; 
 assign led_o[10:3] = data_q;
@@ -140,12 +139,8 @@ assign rst_async = switch_i[0];
 always @(posedge clk or posedge rst_async) begin
 	if (rst_async) begin
 		pll_lock_q <= 1'b0;
-		rst_n_q    <= 1'b0;
-		rst_n_d1_q <= 1'b0;
 	end else begin
 		pll_lock_q <= pll_lock;
-		rst_n_q    <= pll_lock_q; 
-		rst_n_d1_q <= rst_n_q; 
 	end
 end
 
@@ -177,7 +172,7 @@ tt_um_essen m_top(
 	.uio_oe(uio_oe),
 	.ena(ena),
 	.clk(clk),
-	.rst_n(rst_n_q)
+	.rst_n(rst_async)
 );
 
 endmodule
