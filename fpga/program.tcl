@@ -1,13 +1,12 @@
 set checkpoint_path [lindex $argv 0]
-set out_dir [lindex $argv 1]
-puts "Programming script called with checkpoint path $checkpoint_path, generating bitsteam to $out_dir folder"
+set bit_path [lindex $argv 1]
+puts "Programming script called with checkpoint path $checkpoint_path, loading bitsteam $bit_path"
 
 
 
 puts "Opening program at $checkpoint_path"
 open_checkpoint $checkpoint_path 
 
-set bin_path "$out_dir/[current_project]"
 
 open_hw_manager
 connect_hw_server
@@ -16,13 +15,10 @@ connect_hw_server
 puts "Detecting hw target [current_hw_target]"
 
 if { [current_hw_target] ne "" } {
-	puts "Writing bistream at $bin_path.bit"
-	write_bitstream "$bin_path.bit" -force
-
 	open_hw_target
 	current_hw_device
 
-	set_property PROGRAM.FILE $bin_path.bit [current_hw_device]
+	set_property PROGRAM.FILE $bit_path [current_hw_device]
 
 	set fail [program_hw_device -verbose]
 	

@@ -59,7 +59,6 @@ set_property -dict { PACKAGE_PIN P18   IOSTANDARD LVCMOS33  } [get_ports {tdo_o}
 set_property -dict { PACKAGE_PIN L17  IOSTANDARD LVCMOS33 PULLDOWN true } [get_ports {clk_bus_i}];
 create_clock -add -name clk_bus_i -period 25.00 [get_ports clk_bus_i]
 
-
 # tie unused pins
 set_property -dict { PACKAGE_PIN W7   IOSTANDARD LVCMOS33 } [get_ports {unused_o[0]}]
 set_property -dict { PACKAGE_PIN W6   IOSTANDARD LVCMOS33 } [get_ports {unused_o[1]}]

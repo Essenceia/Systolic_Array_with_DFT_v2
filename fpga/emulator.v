@@ -8,9 +8,9 @@ module emulator #(
     // PmodC
 	input wire clk_bus_i, /* 40 MHz for now */
    
-	input wire tck_i,
-    input wire tdi_i, 
-    input wire tms_i,
+	input wire  tck_i,
+    input wire  tdi_i, 
+    input wire  tms_i,
     output wire tdo_o,
 
 	input wire [SWITCH_W-1:0] switch_i,
@@ -20,7 +20,7 @@ module emulator #(
 	
 	// Pmod B
 	input  wire               data_v_i,
-	input  wire               data_mode_i,
+	input  wire [1:0]         data_mode_i,
 	input  wire               data_rst_addr_i,
 	
 	output wire               res_v_o,
@@ -50,7 +50,6 @@ wire [7:0] uio_oe;
 reg [PMOD_W-1:0] data_bus_q, data_q;
 reg  data_mode_bus_q, data_mode_q;
 reg  data_v_bus_q, data_v_q;
-reg  data_rst_addr_bus_q, data_rst_addr_q;
 
 wire [PMOD_W-1:0] res;
 wire res_v;
@@ -103,9 +102,6 @@ always @(posedge clk) begin
 
 	data_mode_bus_q <= data_mode_i;
 	data_mode_q     <= data_mode_bus_q;
-
-	data_rst_addr_bus_q <= data_rst_addr_i;
-	data_rst_addr_q     <= data_rst_addr_bus_q;
 
 	data_v_bus_q <= data_v_i;
 	data_v_q     <= data_v_bus_q;
@@ -163,7 +159,7 @@ assign tdo_o = tdo;
 
 /* deisgn top level */ 
 assign ui_in = {data_q[6:0] , tck };
-assign uio_in = { 2'b0 , tms , tdi , data_rst_addr_q, data_mode_q, data_v_q, data_q[7]};
+assign uio_in = { 2'b0 , tms , tdi , data_mode_q, data_v_q, data_q[7]};
 
 assign tdo          = uio_out[6];
 assign res_v        = uio_out[7];
