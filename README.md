@@ -1,14 +1,15 @@
 # Systollic Array with DFT v2 
 
 Second iteration on the systollic array targetting IHP 180 nm 
-open PDK, part of Tiny Tapeout shuttle `sky26a`.
+open PDK. 
 
 
 ## Improvements on v1 
 
+[Link to v1, tapedout on GlobalFoundary 180nm, part of Tiny Tapeout experimental shuttle `gf0p2`](https://github.com/Essenceia/Systolic_MAC_with_DFT)
+
 - signed intergers upgraded to floating point math using `bfloat16`
 - systollic array flops part of scan chain for debugging
-- including denser SRAM memories using IHP macro
 - higher clock frequency: max 100MHz target
 
 ### Floating point math 
@@ -16,10 +17,17 @@ open PDK, part of Tiny Tapeout shuttle `sky26a`.
 This design will be including a from scratch custom implementation of the 
 bfloat16 artithemtic optimized for performance and area. 
 
-Given the nature of the workload and the additional cost of there support 
-this implementation will not be supporting subnormals: all subnormals will be clamped to 0. 
+This implementation leverages the fact there is no official standard outlining the 
+behavior of `bfloat16` to implement only the subset of floating point behavior 
+that I judge to be neccessary for our workload in favor of higher performance at 
+a low area budget. 
 
-[Link to bfloat repo](https://github.com/Essenceia/BFloat16)
+These choices are : 
+- round toward zero rounding only
+- no subnormal support, all subnormals will be clamped to 0
+- no $\pm \infty$ support
+
+For more information refer to the [bfloat repository](https://github.com/Essenceia/BFloat16)
 
 ## Dependancies
 
