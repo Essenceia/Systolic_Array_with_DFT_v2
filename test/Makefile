@@ -28,7 +28,13 @@ else
 SIM_BUILD		= sim_build/gl_cvc
 COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DSIM
+
+ifeq ($(PHONY_GATES),yes)
+VERILOG_SOURCES +=$(PWD)/../lib/sg13g2_stdcell_phony.v
+else
 VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v
+endif
+
 VERILOG_SOURCES += ../final/tt_um_essen.nl.v
 ifeq ($(SIM),cvc)
 # WHY ARE WE CALLING THE SIM CVC WHEN WE ARE USING CVC64 AAAAAAHHHH

@@ -22,10 +22,10 @@ CONF := conf
 DEBUG_FLAG := $(if $(debug), debug=1)
 DEFINES := $(if $(wave),wave=1)
 WAIVER_FILE := waiver.vlt
-FPGA_LIB:= lib
+GATE_PHONY_LIB:= lib
 IMPLEM_DIR := final
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga tv test gates sdf def gl
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl
 
 ########
 # Lint #
@@ -63,6 +63,7 @@ endif
 
 entry_deps := $(wildcard $(SRC_DIR)/*.v) $(wildcard $(BF16_SRC_DIR)/*.v)
 fpga_deps := $(entry_deps) $(wildcard $(FPGA_DIR)/*.v)
+gate_phony_deps := $(IMPLEM_DIR)/$(PROJET_NAME).nl.v $(GATE_PHONY_LIB)/sg13g2_stdcell_phony.v 
 
 lint: $(entry_deps)
 	$(call LINT,$^,$(PROJET_NAME))
@@ -70,6 +71,8 @@ lint: $(entry_deps)
 lint_fpga: $(fpga_deps)
 	$(call LINT,$^,emulator)
 
+lint_gate_phony: $(gate_phony_deps) 
+	$(call LINT,$^,$(PROJET_NAME))
 
 ############################
 # Implementation artifacts #

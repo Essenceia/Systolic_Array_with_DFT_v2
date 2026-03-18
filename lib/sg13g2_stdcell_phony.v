@@ -350,7 +350,7 @@ module sg13g2_nor2b_1 (
 );
     assign Y = ~(A | ~B_N);
 endmodule
-module sg13g2_nor2b_1 (
+module sg13g2_nor2b_2 (
     input  wire A,
     input  wire B_N,
     output wire Y
