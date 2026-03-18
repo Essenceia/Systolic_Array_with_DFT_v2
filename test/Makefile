@@ -30,9 +30,9 @@ COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DSIM
 
 ifeq ($(PHONY_GATES),yes)
-VERILOG_SOURCES +=$(PWD)/../lib/sg13g2_stdcell_phony.v
+VERILOG_SOURCES =$(PWD)/../lib/sg13g2_stdcell_phony.v
 else
-VERILOG_SOURCES += $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v
+VERILOG_SOURCES = $(PDK_ROOT)/ihp-sg13g2/libs.ref/sg13g2_stdcell/verilog/sg13g2_stdcell.v
 endif
 
 VERILOG_SOURCES += ../final/tt_um_essen.nl.v
@@ -56,5 +56,6 @@ TOPLEVEL = tb
 # List test modules to run, separated by commas and without the .py suffix:
 COCOTB_TEST_MODULES = test
 
+$(info VERILOG_SOURCES=$(VERILOG_SOURCES))
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim

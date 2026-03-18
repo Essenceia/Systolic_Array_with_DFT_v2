@@ -20,34 +20,39 @@ module tb ();
   reg clk;
   reg rst_n;
   reg ena;
+
   reg [7:0] ui_in;
   reg [7:0] uio_in;
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
-`ifdef GL_TEST
-  wire VPWR = 1'b1;
-  wire VGND = 1'b0;
-`endif
 
-  wire tck; 
-  wire result_v; 
-  assign result_v = uio_out[7];
-  assign tck = ui_in[1];
+ 	wire tck; 
+	wire tms; 
+	wire tdi; 
+	wire tdo; 
+ 	wire result_v;
+	wire [7:0] result; 
 
-  wire [7:0] i_in; 
-  assign i_in = {ui_in[7:1], tck};
+  	assign result_v = uio_out[7];
+	assign result = uo_out[7:0];
+
+	wire       data_v; 
+	wire [1:0] data_mode;
+	wire [7:0] data;
+
+	assign uio_in[1] = data_v; 
+	assign uio_in[3:2] = data_mode; 
+	assign {uio_in[0], ui_in[7:1]} = data;
+	
+	assign ui_in[0] = tck; 
+	assign uio_in[4] = tdi; 
+	assign uio_in[5] = tms; 
+	assign tdo = uio_out[6];
 
   // Replace tt_um_example with your module name:
   tt_um_essen m_dut (
-
-      // Include power ports for the Gate Level test:
-`ifdef GL_TEST
-      .VPWR(VPWR),
-      .VGND(VGND),
-`endif
-
-      .ui_in  (i_in),    // Dedicated inputs
+      .ui_in  (ui_in),    // Dedicated inputs
       .uo_out (uo_out),   // Dedicated outputs
       .uio_in (uio_in),   // IOs: Input path
       .uio_out(uio_out),  // IOs: Output path
