@@ -129,23 +129,15 @@ endmodule
 
 // decoupling capacitors, no logic
 module sg13g2_decap_4 (
-    input  wire VPWR,
-    input  wire VGND
 );
 endmodule
 module sg13g2_decap_8 (
-    input  wire VPWR,
-    input  wire VGND
 );
 endmodule
 module sg13g2_fill_1 (
-    input  wire VPWR,
-    input  wire VGND
 );
 endmodule
 module sg13g2_fill_2 (
-    input  wire VPWR,
-    input  wire VGND
 );
 endmodule
 
@@ -433,15 +425,15 @@ endmodule
 
 // tie cells, high
 module sg13g2_tiehi (
-    output wire HI
+    output wire L_HI
 );
-    assign HI = 1'b1;
+    assign L_HI = 1'b1;
 endmodule
 // low
 module sg13g2_tielo (
-    output wire LO
+    output wire L_LO
 );
-    assign LO = 1'b0;
+    assign L_LO = 1'b0;
 endmodule
 
 // xor
