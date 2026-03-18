@@ -32,8 +32,9 @@ MAX_VAL = 65535
 # rate and the TX FIFO being empty. 
 async def invalid_data(dut, cycles):
 	for i in range(0, cycles):
-		dut.uio_in.value = 0
-		dut.ui_in.value = 0
+		dut.data_v.value = 0
+		dut.data_mode.value = random.randint(0,3)
+		dut.data.value = random.randint(0,255)
 		await ClockCycles(dut.clk,1)
 
 
@@ -56,17 +57,15 @@ async def invalid_data(dut, cycles):
 # tdi - 4 - input data 
 # tms - 5 - fsm transition selection
 #
-def get_cmd(valid=True, mode=MODE_DATA, tdi=False, tms=False):
+def set_cmd(valid=True, mode=MODE_DATA):
+	dut.data_v.value = v
 	ret = 0
 	if valid:
-		ret |= 1 << 1
-	ret |= mode << 2
-	if tdi:
-		ret |= 1 << 4
-	if tms: 
-		ret |= 1 << 5
+		dut.data_v.value = 1
+	else: 
+		dut.data_v.value = 0
 
-	return ret
+	dut.data_mode.value = mode
 
 # Signed to Unsigned
 def stou(n): 
@@ -92,15 +91,14 @@ async def write_config(dut, X, weight=True):
 	for i in range(0,NN*BASE_W):
 		if (random.randrange(0,100) > 75):
 			await invalid_data(dut, random.randrange(1,5)) 
-		dut.ui_in.value = (config[i] << 1) & 0xFE
-		uio_in = get_cmd(valid=True, mode=mode) | (config[i] >> 7 & 0x01)
-		dut.uio_in.value = uio_in
-		cocotb.log.debug("write config %d:%s %s", i, config[i], uio_in)
+		dut.data.value = config[i] 
+		set_cmd(valid=True, mode=mode)
+		cocotb.log.debug("write config %d:%s", i, config[i])
 		await ClockCycles(dut.clk,1)
-	dut.uio_in.value = 0
+	dut.data_v.value = 0
 
 async def rst_data_addr(dut):
-	dut.uio_in.value = get_cmd(valid=True, mode=MODE_RST)
+	set_cmd(valid=True, mode=MODE_RST)
 	await ClockCycles(dut.clk, 1)
 
 

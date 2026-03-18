@@ -103,7 +103,7 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 			set_cmd(tms=(i == drl-1), tdi=(tdi_buffer[i] == 1))
 			await ClockCycles(dut.tck, 1)
 			if i : 
-				tdo = dut.uio_out.value[6]
+				tdo = dut.tdo.value
 				if not(bypass_read):
 					ret |= int(tdo) << i-1
 	  
@@ -111,7 +111,7 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 		set_cmd(tms=True)
 		await ClockCycles(dut.tck, 1)
 		
-		tdo = dut.uio_out.value[6]
+		tdo = dut.tdo.value[6]
 		if not(bypass_read):
 			ret |= int(tdo) << drl-1
 		
@@ -178,13 +178,13 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 			set_cmd(tms=(i == x-1), tdi=(tdi == 1))
 			await ClockCycles(dut.tck, 1)
 			if ( i > 1 ) :
-				tdo = dut.uio_out.value[6]
+				tdo = dut.tdo.value
 				tdo_buffer.append(tdo)
 	   
 		# exit 1r
 		set_cmd(tms=True)
 		await ClockCycles(dut.tck, 1)
-		tdo = dut.uio_out.value[6]
+		tdo = dut.tdo.value
 		tdo_buffer.append(tdo) 
 
 		# check bypass results, input should match output
@@ -202,17 +202,9 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 
 
 	def set_random_input_pin_data():
-		pin_i = bytearray(0)
-		for i in range(0, PIN_IN_N):
-			x = random.randint(0,1)
-			pin_i.append(x)
-		io_v = 0
-		io_v |= (pin_i[2] << 2| pin_i[1]<< 1 | pin_i[0]) << 1
-		io_v |= pin_i[10] # data_i[7]
-		i_v = 0 
-		i_v |= pin_i[9] << 7 | pin_i[8] << 6 |pin_i[7] << 5 |pin_i[6] << 4 | pin_i[5] << 3 | pin_i[4] << 2 | pin_i[3] << 1
-		pin_i.reverse()
-		return i_v, io_v, pin_i
+		dut.data_v.value = random.randint(0,1)
+		dut.data_mode.value = random.randint(0,3)
+		dut.data.value = random.randint(0, 255)  
 
 	def set_random_output_pin_data():
 		pin_o = bytearray(0)
@@ -246,14 +238,9 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 		# capture dr - sample data on the external pins
 
 		# set data on the input pins to a known state
-		ui_in, uio_in, expected_bsc_in = set_random_input_pin_data()
-		set_cmd(tms=False) | uio_in
-		tck = dut.ui_in.value[0]
-		dut.ui_in.value = ui_in
-		dut.ui_in.value[0] = tck
-		cocotb.log.debug("uio_in %s", hex(uio_in) )
-		cocotb.log.debug("ui_in %s",  hex(ui_in))
-		cocotb.log.debug("expected bsc in %s", expected_bsc_in)
+		set_random_input_pin_data()
+		set_cmd(tms=False) 
+		dut.data.value = ui_in
 		await ClockCycles(dut.tck, 1)
 	   
 		uo_out, uio_out, tdi_buffer = set_random_output_pin_data()
@@ -268,7 +255,7 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 			set_cmd(tms=(i == BSC_LENGTH-1), tdi=(tdi_buffer[i] == 1))
 			cocotb.log.debug("i %d %s", i, tdi_buffer[i])
 			await ClockCycles(dut.tck, 1)
-			tdo = dut.uio_out.value[6]
+			tdo = dut.tdo.value
 			if (i-1 > PIN_OUT_N-1):
 				cocotb.log.debug("i %d %s", i, tdo)
 				tdo_buffer.append(tdo)
@@ -277,7 +264,7 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 		set_cmd(tms=True)
 		await ClockCycles(dut.tck, 1)
 	   
-		tdo = dut.uio_out.value[6]
+		tdo = dut.tdo.value
 		tdo_buffer.append(tdo) 
 		 
 		# check captured bits values match inputs
