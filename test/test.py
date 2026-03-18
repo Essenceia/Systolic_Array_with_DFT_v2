@@ -145,7 +145,7 @@ async def random_mac_reuse_weights_test(dut):
 # read out idcode 
 async def jtag_read_idcode(dut):
 	v, p, m = await jtag_utils.get_idcode(dut)
-	assert(v == 1)
+	assert(v == 2)
 	assert(p == 0xbeef) 
 	assert(m == 0x6b)
 
