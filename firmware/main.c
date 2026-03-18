@@ -131,12 +131,16 @@ int main() {
 	send_data_rst(p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 
 	while (true) {
-		send_data(d, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
-		//sleep_ms(DELAY_MS);
-		pio_sm_put_blocking(pio[PIO_LED], sm[PIO_LED], led);
+		//send_data(d, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		
+		sleep_ms(DELAY_MS);
 		led = led ? 0:1;
+		
+		/*
+		pio_sm_put_blocking(pio[PIO_LED], sm[PIO_LED], led);
 		setup_rd_dma_res_stream(rd_dma_chan, sizeof(res_buffer), res_buffer, sizeof(res_buffer), pio[PIO_RD], sm[PIO_RD]);
 		send_data(d, false, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 		read_res(res, sizeof(res), res_buffer, sizeof(res_buffer), rd_dma_chan);
+		*/
     }
 }

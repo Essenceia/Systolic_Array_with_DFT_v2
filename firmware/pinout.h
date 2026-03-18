@@ -21,7 +21,7 @@ typedef struct __attribute__((packed)) {
 	uint8_t valid_i : 1;    // wr valid GP[16]   -> JB[JB1]
 	uint8_t data_mode_i : 2;// wr mode  GP[18:17]-> JB[JB3:JB2]
 	uint8_t res_valid_o : 1;// rd valid GP[19]   -> JB[JB4]
-	uint8_t unusued :12;    //    -     GP[31:20]
+	uint16_t unusued :12;   //    -     GP[31:20]
 } pinout_t;
 
 _Static_assert(sizeof(pinout_t) == (32/8));
