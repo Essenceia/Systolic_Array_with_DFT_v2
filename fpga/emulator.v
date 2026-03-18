@@ -47,15 +47,15 @@ wire [7:0] uio_out;
 wire [7:0] uio_oe;
 
 reg [PMOD_W-1:0] data_bus_q, data_q;
-reg  data_mode_bus_q, data_mode_q;
-reg  data_v_bus_q, data_v_q;
+reg [1:0]        data_mode_bus_q, data_mode_q;
+reg              data_v_bus_q, data_v_q;
 
 wire [PMOD_W-1:0] res;
 wire res_v;
 reg  [PMOD_W-1:0] res_bus_q;
 reg              res_v_bus_q;
-(* MARK_DEBUG = "true" *)reg [PMOD_W-1:0] res_bus_d2_q;
-(* MARK_DEBUG = "true" *)reg              res_v_bus_d2_q;
+reg [PMOD_W-1:0] res_bus_d2_q;
+reg              res_v_bus_d2_q;
 
 (* MARK_DEBUG = "true" *) wire tck, tdi, tdo, tms; 
 
@@ -120,10 +120,10 @@ assign res_v_o = res_v_bus_d2_q;
 /* debug leds */
 assign led_o[0] = rst_async;
 assign led_o[1] = ena;
-assign led_o[2] = clk_ibuf; 
-assign led_o[10:3] = data_q;
+assign led_o[2] = clk_ibuf;
+assign led_o[3] = pll_lock_q; 
 
-assign led_o[11]    = 1'b1; // seperator
+assign led_o[11:4] = data_q;
 
 assign led_o[12]    = tck;
 assign led_o[13]    = tdi;
@@ -156,8 +156,14 @@ assign tms = tms_i;
 assign tdo_o = tdo; 
 
 /* deisgn top level */ 
-assign ui_in = {data_q[6:0] , tck };
-assign uio_in = { 2'b0 , tms , tdi , data_mode_q, data_v_q, data_q[7]};
+assign ui_in[7:1]  = data_q[6:0];
+assign ui_in[0]    = tck;
+assign uio_in[7:6] = 2'b0;
+assign uio_in[5]   = tms;
+assign uio_in[4]   = tdi;
+assign uio_in[3:2] = data_mode_q;
+assign uio_in[1]   = data_v_q;
+assign uio_in[0]   = data_q[7];
 
 assign tdo          = uio_out[6];
 assign res_v        = uio_out[7];
@@ -171,7 +177,7 @@ tt_um_essen m_top(
 	.uio_oe(uio_oe),
 	.ena(ena),
 	.clk(clk),
-	.rst_n(rst_async)
+	.rst_n(~rst_async)
 );
 
 endmodule

@@ -73,11 +73,19 @@ localparam IR_EXIT_2  = 14;
 localparam IR_UPDATE  = 15;
 
 (* MARK_DEBUG = "true" *) reg [3:0] fsm_q;
-reg  jtag_enabled_q;
+(* MARK_DEBUG = "true" *) reg  jtag_enabled_q;
+
+(* MARK_DEBUG = "true" *) wire debug_trst, debug_tck, debug_tms; 
+assign debug_trst = trst_i; 
+assign debug_tck = tck_i; 
+assign debug_tms = tms_i; 
+
+(* MARK_DEBUG = "true" *) wire fsm_rst;
+assign fsm_rst = trst_i | ~jtag_enabled_q; 
 
 /* fsm is reset though the RESET TAP */
 always @(posedge tck_i) begin
-	if (trst_i | ~jtag_enabled_q) begin 
+	if (fsm_rst) begin 
 		fsm_q <= RESET;
 	end else begin // block isn't going to be power gatted
 		case(fsm_q)
@@ -142,21 +150,19 @@ reg [UREG_W-1:0]             ureg_tdi_q;
 // addr
 always @(posedge tck_i) begin
 	if (ir == USER_REG) begin
-		if (fsm_q == DR_UPDATE) begin
+		if (fsm_q == DR_UPDATE) 
 			{ unused_ureg_addr_q , ureg_addr_q } <= ureg_tdi_q;
-		end else if (fsm_q == DR_SHIFT) begin
+		else if (fsm_q == DR_SHIFT)
 			ureg_tdi_q  <= {tdi_i, ureg_tdi_q[UREG_W-1:1]};
-		end
 	end
 end
 // data
 always @(posedge tck_i) begin
 	if (ir == USER_REG) begin
-		if (fsm_q == DR_CAPTURE) begin
+		if (fsm_q == DR_CAPTURE) 
 			ureg_data_q <= ureg_data_i;
-		end else if (fsm_q == DR_SHIFT) begin
+		else if (fsm_q == DR_SHIFT) 
 			ureg_data_q <= {1'b0, ureg_data_q[UREG_W-1:1]};
-		end
 	end
 end
 assign ureg_addr_o = ureg_addr_q; 

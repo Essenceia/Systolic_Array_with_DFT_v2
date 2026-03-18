@@ -29,11 +29,11 @@ assign     unused_input = uio_in[7:6];
 assign     uio_out[5:0] = 6'b0;  
 
 /* I/O interface, marked for boundary scan insertion */ 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire            data_v_bsc;
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [1:0]      data_mode_bsc; 
-(* MARK_BSC = "in" , MARK_DEBUG = "true" *) wire [IO_W-1:0] data_bsc;
-(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire            result_v_bsc;
-(* MARK_BSC = "out", MARK_DEBUG = "true" *) wire [IO_W-1:0] result_bsc;
+(* MARK_BSC = "in"  *) wire            data_v_bsc;
+(* MARK_BSC = "in"  *) wire [1:0]      data_mode_bsc; 
+(* MARK_BSC = "in"  *) wire [IO_W-1:0] data_bsc;
+(* MARK_BSC = "out" *) wire            result_v_bsc;
+(* MARK_BSC = "out" *) wire [IO_W-1:0] result_bsc;
 
 wire [BSC_CHAIN_W-1:0] bsc_chain;
 wire bsc_tdo;
