@@ -202,9 +202,15 @@ async def test_bypass(dut):
 
 
 def set_random_input_pin_data(dut):
-	dut.data_v.value = random.randint(0,1)
-	dut.data_mode.value = random.randint(0,3)
-	dut.data.value = random.randint(0, 255)  
+	pin_i = bytearray(0)
+	for i in range(0, PIN_IN_N):
+	    x = random.randint(0,1)
+	    pin_i.append(x)
+	dut.data_v.value = pin_i[0]
+	dut.data_mode.value = pin_i[2] << 1 | pin_i[1]
+	dut.data.value = pin_i[10] < 7 | pin_i[9] << 6 | pin_i[8] << 5 |pin_i[7] << 4 |pin_i[6] << 3 | pin_i[5] << 2 | pin_i[4] << 1 | pin_i[3]
+	pin_i.reverse()
+	return pin_i 
 
 def set_random_output_pin_data():
 	pin_o = bytearray(0)
@@ -236,13 +242,12 @@ async def test_bsc(dut, extest=True):
 	# capture dr - sample data on the external pins
 
 	# set data on the input pins to a known state
-	set_random_input_pin_data(dut)
+	expected_bsc_in = set_random_input_pin_data(dut)
 	set_cmd(dut,tms=False) 
-	dut.data.value = random.randint(0, 255) 
 	await ClockCycles(dut.tck, 1)
    
 	uo_out, uio_out, tdi_buffer = set_random_output_pin_data()
-	cocotb.log.debug("tdi buffer %s %d %d", tdi_buffer, len(tdi_buffer), tdi_buffer[8])
+	cocotb.log.info("tdi buffer %s %d %d", tdi_buffer, len(tdi_buffer), tdi_buffer[8])
 
 	# shift dr, write expected output pin data over tdi
 	# capture shifted out values writen over input pins over tdo
@@ -251,11 +256,11 @@ async def test_bsc(dut, extest=True):
 	# write tdi in and tdo
 	for i in range(0, BSC_LENGTH):
 		set_cmd(dut,tms=(i == BSC_LENGTH-1), tdi=(tdi_buffer[i] == 1))
-		cocotb.log.debug("i %d %s", i, tdi_buffer[i])
+		cocotb.log.debug("tdi i %d %s", i, tdi_buffer[i])
 		await ClockCycles(dut.tck, 1)
 		tdo = dut.tdo.value
 		if (i-1 > PIN_OUT_N-1):
-			cocotb.log.debug("i %d %s", i, tdo)
+			cocotb.log.info("tdo i %d %s", i, tdo)
 			tdo_buffer.append(tdo)
 	
 	# exit 1r
@@ -266,8 +271,8 @@ async def test_bsc(dut, extest=True):
 	tdo_buffer.append(tdo) 
 	 
 	# check captured bits values match inputs
-	cocotb.log.debug("expected %s",expected_bsc_in)
-	cocotb.log.debug("got	  %s",tdo_buffer)
+	cocotb.log.info("expected %s",expected_bsc_in)
+	cocotb.log.info("got	   %s",tdo_buffer)
 	assert(expected_bsc_in == tdo_buffer)
  
 	# update dr
