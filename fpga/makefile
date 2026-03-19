@@ -4,6 +4,10 @@ ifndef debug
 #debug := 
 endif 
 
+ifndef gates
+#gates :=
+endif
+
 VIVADO_PRJ_DIR=emulator
 VIVADO_PRJ_NAME=$(VIVADO_PRJ_DIR)
 VIVADO_PRJ_PATH=$(VIVADO_PRJ_DIR)/$(VIVADO_PRJ_NAME).xpr
@@ -16,6 +20,7 @@ VIVADO_CMD=vivado -mode batch -source
 SRC_PATH=../src
 BF16_SRC_PATH=$(SRC_PATH)/bf16/src
 
+GATE_NL_FILES=../final/tt_um_essen.nl.v ../lib/sg13g2_stdcell_phony.v
 
 .PHONY: setup build prog gui
 
@@ -23,11 +28,11 @@ all: setup build gen
 
 $(VIVADO_PRJ_PATH): setup.tcl 
 	mkdir -p $(VIVADO_PRJ_DIR)
-	$(VIVADO_CMD) setup.tcl -tclargs $(VIVADO_PRJ_DIR) $(VIVADO_PRJ_NAME) $(SRC_PATH) $(BF16_SRC_PATH) 
+	$(VIVADO_CMD) setup.tcl -tclargs $(VIVADO_PRJ_DIR) $(VIVADO_PRJ_NAME) $(SRC_PATH) $(BF16_SRC_PATH)  $(if $(gates),1 $(GATE_NL_FILES))
 
 setup: $(VIVADO_PRJ_PATH) 
 
-$(VIVADO_CHECKPOINT_PATH): $(VIVADO_PRJ_PATH) $(wildcard *.xdc) $(wildcard $(SRC_PATH)/*.v) $(wildcard $(BF16_SRC_PATH)/*.v) $(wildcard *.v)
+$(VIVADO_CHECKPOINT_PATH): $(VIVADO_PRJ_PATH) $(wildcard *.xdc) $(wildcard $(SRC_PATH)/*.v) $(if $(gates),$(GATE_NL_FILES), $(wildcard $(BF16_SRC_PATH)/*.v) $(wildcard *.v))
 	$(VIVADO_CMD) build.tcl -tclargs $(VIVADO_PRJ_PATH) $(VIVADO_BIT_PATH) $(VIVADO_CHECKPOINT_PATH) $(if $(debug), $(debug) $(VIVADO_DEBUG_PROBE_PATH) )
 
 build: $(VIVADO_CHECKPOINT_PATH)

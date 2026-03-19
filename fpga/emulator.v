@@ -1,4 +1,6 @@
+`ifndef USE_GATE_NL
 `default_nettype none
+`endif
 module emulator #(
 	parameter SWITCH_W = 2,
 	parameter PMOD_W = 8,
