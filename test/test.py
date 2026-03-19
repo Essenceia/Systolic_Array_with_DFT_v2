@@ -34,6 +34,8 @@ async def rst(dut, ena=1, start_jtag=False):
 	dut.tdi.value = "X"
 	start_clk(dut)
 	if start_jtag:
+		dut.tms.value = 0
+		dut.tdi.value = 0
 		start_jtag_clk(dut)
 	await ClockCycles(dut.clk, 2)
 	dut.rst_n.value = 0
