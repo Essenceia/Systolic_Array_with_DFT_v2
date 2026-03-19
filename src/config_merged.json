@@ -58,6 +58,7 @@
   "SCRIPTS_DIR":"/home/gp/librelane/librelane/scripts",
 "LINTER_DISABLE_WARNINGS"    :["DECLFILENAME", "EOFNEWLINE", "TIMESCALEMOD"],
   "JTAG_CLOCK_NAME": "ui_in[0]",
+  "DFT_MAX_LENGTH":  500,
   "DFT_SCAN_EN_PORT":  "m_dft_sc_en_buf/X",
   "DFT_SCAN_TDI_PORT": "m_dft_sc_tdi_buf/X",
   "DFT_SCAN_TDO_PORT": "m_dft_sc_tdo_buf/A"
