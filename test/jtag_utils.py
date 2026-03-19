@@ -21,7 +21,7 @@ BSC_LENGTH = PIN_IN_N + PIN_OUT_N
 
 USER_REG_W = 8
 
-def set_cmd(tms=False, tdi=False):
+def set_cmd(dut,tms=False, tdi=False):
 	if (tms):
 	    dut.tms.value = 1
 	else:
@@ -36,47 +36,47 @@ def set_cmd(tms=False, tdi=False):
 async def rst_jtag_tap(dut):
 	x = random.randint(5, 20)
 	for _ in range(0,x):
-	    set_cmd(tms=True)
+	    set_cmd(dut,tms=True)
 	    await ClockCycles(dut.tck, 1)
 	
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
    
    
 # assumes we are starting our command from the idle position
 async def set_ir(dut, ir, irl=IR_L):
 	# idle 
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
    
 	# dr select
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
  
 	# ir select 
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 	
 	# capture ir
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
    
 	# shift ir
 	for i in range(0, irl):
 	    tdi = (ir >> i) & 0x1
-	    set_cmd(tms=(i == irl-1), tdi=(tdi == 1))
+	    set_cmd(dut,tms=(i == irl-1), tdi=(tdi == 1))
 	    await ClockCycles(dut.tck, 1)
 	
 	# exit 1r
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
 	
 	# update ir
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 	# got back to idle
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 # starting from idle, read the data register of length drl
@@ -87,20 +87,20 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 	    tdi_buffer = bytearray(drl)
 
 	# idle 
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
    
 	# dr select
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 	 
 	# capture dr
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 	
 	# shift dr
 	for i in range(0, drl):
-		set_cmd(tms=(i == drl-1), tdi=(tdi_buffer[i] == 1))
+		set_cmd(dut,tms=(i == drl-1), tdi=(tdi_buffer[i] == 1))
 		await ClockCycles(dut.tck, 1)
 		if i : 
 			tdo = dut.tdo.value
@@ -108,19 +108,19 @@ async def read_dr(dut, drl, tdi_buffer=bytearray(0), bypass_read=False):
 				ret |= int(tdo) << i-1
 	
 	# exit 1r
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
 	
-	tdo = dut.tdo.value[6]
+	tdo = dut.tdo.value
 	if not(bypass_read):
 		ret |= int(tdo) << drl-1
 	
 	# update dr
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 	# got back to idle
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 	return ret
@@ -155,15 +155,15 @@ async def test_bypass(dut):
 	# go to shift dr mode
 	
 	# idle 
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
    
 	# dr select
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
  
 	# capture dr
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
    
 	# shift dr
@@ -175,14 +175,14 @@ async def test_bypass(dut):
 		tdi = random.randint(0,1)
 		if i != x-1:
 			tdi_buffer.append(tdi)
-		set_cmd(tms=(i == x-1), tdi=(tdi == 1))
+		set_cmd(dut,tms=(i == x-1), tdi=(tdi == 1))
 		await ClockCycles(dut.tck, 1)
 		if ( i > 1 ) :
 			tdo = dut.tdo.value
 			tdo_buffer.append(tdo)
    
 	# exit 1r
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
 	tdo = dut.tdo.value
 	tdo_buffer.append(tdo) 
@@ -193,15 +193,15 @@ async def test_bypass(dut):
 	assert(tdi_buffer == tdo_buffer) 
 	 
 	# update dr
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 	# got back to idle
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 
-def set_random_input_pin_data():
+def set_random_input_pin_data(dut):
 	dut.data_v.value = random.randint(0,1)
 	dut.data_mode.value = random.randint(0,3)
 	dut.data.value = random.randint(0, 255)  
@@ -223,24 +223,22 @@ async def test_bsc(dut, extest=True):
 		await set_ir(dut, SAMPLE_PRELOAD) 
 
 	# set random data to in
-	tck = dut.ui_in.value[0]
-	dut.ui_in.value = random.randint(0, 255) 
-	dut.ui_in.value[0] = tck
+	dut.data.value = random.randint(0, 255) 
 
 	 # idle 
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
    
 	# dr select
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
  
 	# capture dr - sample data on the external pins
 
 	# set data on the input pins to a known state
-	set_random_input_pin_data()
-	set_cmd(tms=False) 
-	dut.data.value = ui_in
+	set_random_input_pin_data(dut)
+	set_cmd(dut,tms=False) 
+	dut.data.value = random.randint(0, 255) 
 	await ClockCycles(dut.tck, 1)
    
 	uo_out, uio_out, tdi_buffer = set_random_output_pin_data()
@@ -252,7 +250,7 @@ async def test_bsc(dut, extest=True):
 	
 	# write tdi in and tdo
 	for i in range(0, BSC_LENGTH):
-		set_cmd(tms=(i == BSC_LENGTH-1), tdi=(tdi_buffer[i] == 1))
+		set_cmd(dut,tms=(i == BSC_LENGTH-1), tdi=(tdi_buffer[i] == 1))
 		cocotb.log.debug("i %d %s", i, tdi_buffer[i])
 		await ClockCycles(dut.tck, 1)
 		tdo = dut.tdo.value
@@ -261,7 +259,7 @@ async def test_bsc(dut, extest=True):
 			tdo_buffer.append(tdo)
 	
 	# exit 1r
-	set_cmd(tms=True)
+	set_cmd(dut,tms=True)
 	await ClockCycles(dut.tck, 1)
    
 	tdo = dut.tdo.value
@@ -273,7 +271,7 @@ async def test_bsc(dut, extest=True):
 	assert(expected_bsc_in == tdo_buffer)
  
 	# update dr
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 
 	# check output pin's are the same
@@ -282,7 +280,7 @@ async def test_bsc(dut, extest=True):
 		uo_out = dut.uo_out.value
 
 	# got back to idle
-	set_cmd(tms=False)
+	set_cmd(dut,tms=False)
 	await ClockCycles(dut.tck, 1)
 	
 	# check output diven pins

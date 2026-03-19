@@ -57,9 +57,7 @@ async def invalid_data(dut, cycles):
 # tdi - 4 - input data 
 # tms - 5 - fsm transition selection
 #
-def set_cmd(valid=True, mode=MODE_DATA):
-	dut.data_v.value = v
-	ret = 0
+def set_cmd(dut, valid=True, mode=MODE_DATA):
 	if valid:
 		dut.data_v.value = 1
 	else: 
@@ -92,13 +90,13 @@ async def write_config(dut, X, weight=True):
 		if (random.randrange(0,100) > 75):
 			await invalid_data(dut, random.randrange(1,5)) 
 		dut.data.value = config[i] 
-		set_cmd(valid=True, mode=mode)
+		set_cmd(dut,valid=True, mode=mode)
 		cocotb.log.debug("write config %d:%s", i, config[i])
 		await ClockCycles(dut.clk,1)
 	dut.data_v.value = 0
 
 async def rst_data_addr(dut):
-	set_cmd(valid=True, mode=MODE_RST)
+	set_cmd(dut,valid=True, mode=MODE_RST)
 	await ClockCycles(dut.clk, 1)
 
 
