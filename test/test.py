@@ -28,14 +28,20 @@ def start_jtag_clk(dut):
 
 # Reset sequence
 async def rst(dut, ena=1, start_jtag=False):
-	dut.rst_n.value = 0
+	dut.rst_n.value = 1
+	dut.tck.value = 0
+	dut.tms.value = "X"
+	dut.tdi.value = "X"
 	start_clk(dut)
 	if start_jtag:
 		start_jtag_clk(dut)
 	await ClockCycles(dut.clk, 2)
+	dut.rst_n.value = 0
+	await ClockCycles(dut.clk, 2)
 	# set default io
-	dut.ui_in.value = 0
-	dut.uio_in.value = 0
+	dut.data_v.value = 0
+	dut.data.value = "X"*8
+	dut.data_mode.value = "X"*2
 	dut.ena.value = 0
 	await ClockCycles(dut.clk, 10)
 	dut.rst_n.value = 1

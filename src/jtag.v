@@ -168,7 +168,7 @@ end
 assign ureg_addr_o = ureg_addr_q; 
 
 /* SCAN_CHAIN_CHAIN */
-assign sc_en_o = (ir == SCAN_CHAIN) & (fsm_q == DR_SHIFT);
+assign sc_en_o = jtag_enabled_q & (ir == SCAN_CHAIN) & (fsm_q == DR_SHIFT);
 assign sc_tdi_o = tdi_i;
 
 /* JTAG dissabled mask */ 
