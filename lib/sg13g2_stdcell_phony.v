@@ -16,6 +16,15 @@ module sg13g2_a21o_1 (
 );
     assign X = (A1 & A2) | B1;
 endmodule
+module sg13g2_a21o_2 (
+    input  wire A1,
+    input  wire A2,
+    input  wire B1,
+    output wire X
+);
+    assign X = (A1 & A2) | B1;
+endmodule
+
 
 // double and -> single or, output inverted
 module sg13g2_a21oi_1 (
