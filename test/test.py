@@ -1,6 +1,7 @@
 # Cocotb testbench for testing the MAC and JTAG functions of this ASIC design
 #
-# Julia Desmazes, 2025, human made code
+# Julia Desmazes, 2026, human made code
+
 
 import cocotb
 from cocotb.clock import Clock
@@ -11,6 +12,9 @@ import mac_utils
 import jtag_utils
 import asyncio
 from array import array 
+
+import os
+GATES = os.environ["GATES"].lower().strip()
 
 CLK_UNIT="us"
 CLK_PERIOD=10
@@ -82,7 +86,7 @@ async def compare_res(dut, W, I):
 
 # MAC tests 
 
-@cocotb.test()
+@cocotb.test(expect_error=AssertionError if GATES == "yes" else ())
 async def simple_mac_test(dut):
 	await rst(dut) 
 	W = array('H', [0, 1, 2, 3]) 
@@ -104,7 +108,7 @@ async def simple_mac_test(dut):
 		
 	await ClockCycles(dut.clk, 10)
 
-@cocotb.test()
+@cocotb.test(expect_error=AssertionError if GATES == "yes" else ())
 async def random_mac_test(dut):
 	await rst(dut)
 	await mac_utils.rst_data_addr(dut)
@@ -129,7 +133,7 @@ async def random_mac_test(dut):
 		await write_task
 		await comp_task 
 
-@cocotb.test()
+@cocotb.test(expect_error=AssertionError if GATES == "yes" else ())
 async def random_mac_reuse_weights_test(dut):
 	await rst(dut)
 	await mac_utils.rst_data_addr(dut)
@@ -229,6 +233,7 @@ async def jtag_user_reg_test(dut):
 			unit = unit_next
 			first = False
 
+
 @cocotb.test()
 async def jtag_scan_chain_test(dut):
 	await rst(dut, start_jtag=True, start_main_clk=False)
@@ -238,3 +243,5 @@ async def jtag_scan_chain_test(dut):
 	# present without the gate level simulation
 	sc_length = dut.DUT_SC_LENGTH.value.to_unsigned()
 	await jtag_utils.test_scan_chain(dut,sc_length,  dut.clk, SC_CLK_DELAY, CLK_UNIT)
+	cocotb.log.info(cocotb.argv)
+	cocotb.log.info(GATES)
