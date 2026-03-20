@@ -23,6 +23,9 @@ BSC_LENGTH = PIN_IN_N + PIN_OUT_N
 
 USER_REG_W = 8
 
+# Scan chain lenght 
+SC_LENGTH = 100 # mock size
+
 def set_cmd(dut,tms=False, tdi=False):
 	if (tms):
 	    dut.tms.value = 1
@@ -316,8 +319,15 @@ async def scan_user_reg(dut, unit_addr, reg_addr, first_user_reg_read=False):
 	user_reg =  await read_dr(dut, USER_REG_W, tdi_buffer, first_user_reg_read)
 	
 	return user_reg
-	 
-async def test_scan_chain(dut):
+	
+async def manual_scan_chain_clk_cycle(logic_clk, logic_clk_delay, logic_clk_unit):
+	logic_clk.value = 0;
+	await cocotb.triggers.Timer(logic_clk_delay/2, unit=logic_clk_unit)
+	logic_clk.value = 1;
+	await cocotb.triggers.Timer(logic_clk_delay/2, unit=logic_clk_unit)
+	logic_clk.value = 0;
+ 
+async def test_scan_chain(dut, logic_clk, logic_clk_delay, logic_clk_unit):
 	await set_ir(dut, SCAN_CHAIN)
 
 	# go to shift dr mode
@@ -335,19 +345,21 @@ async def test_scan_chain(dut):
 	await ClockCycles(dut.tck, 1)
    
 	# shift dr
-	x = 500
+	x = (SC_LENGTH * 2)+2
 	tdi_buffer = LogicArray('Z'*x, x)
 	tdo_buffer = LogicArray('Z'*x, x)
-	mark_buffer = LogicArray('Z'*x, x)
 	# write tdi in and tdo
 	for i in range(0, x):
 		tdi = random.randint(0,1)
 		if i != x-1:
+			# droping last tdi, not part of capture
 			tdi_buffer[i] = tdi
 		set_cmd(dut,tms=(i == x-1), tdi=(tdi == 1))
+		# let state propage though logic clk
+		await manual_scan_chain_clk_cycle(logic_clk, logic_clk_delay, logic_clk_unit)
 		await ClockCycles(dut.tck, 1)
-		if ( i > 1 ) :
-			tdo_buffer[i] = dut.tdo.value
+		if ( i > 0 ) :
+			tdo_buffer[i-1] = dut.tdo.value
    
 	# exit 1r
 	set_cmd(dut,tms=True)
@@ -355,13 +367,13 @@ async def test_scan_chain(dut):
 	tdo_buffer[x-1] = dut.tdo.value
 
 	# check bypass results, input should match output
-	cocotb.log.info("scan chain test")
-	cocotb.log.info("tdi[%d:0] %s",x-1, tdi_buffer)
-	cocotb.log.info("tdo[%d:0] %s",x-1, tdo_buffer)
-	mark_buffer[0] = 0
-	mark_buffer[1] = 1
-	cocotb.log.info("ref %s", mark_buffer)
-	#assert(tdi_buffer == tdo_buffer) 
+	cocotb.log.debug("scan chain test\nfull buffers:")
+	cocotb.log.debug("tdi[%d:0] %s",x-1, tdi_buffer)
+	cocotb.log.debug("tdo[%d:0] %s",x-1, tdo_buffer)
+	cocotb.log.info("partial buffers:")
+	cocotb.log.info("tdi[%d:0]   %s",SC_LENGTH-1, tdi_buffer[SC_LENGTH-1:0])
+	cocotb.log.info("tdo[%d:%d] %s",SC_LENGTH*2-2,SC_LENGTH-1, tdo_buffer[SC_LENGTH*2-2:SC_LENGTH-1])
+	assert(tdi_buffer[SC_LENGTH-1:0] == tdo_buffer[SC_LENGTH*2-2:SC_LENGTH-1]) 
 	 
 	# update dr
 	set_cmd(dut,tms=False)

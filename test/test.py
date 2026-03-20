@@ -18,6 +18,8 @@ TCK_UNIT=CLK_UNIT
 TCK_PERIOD=77
 CLK_TIMEOUT_PERIOD=(CLK_PERIOD*1000)
 
+SC_CLK_DELAY=2
+
 def start_clk(dut):
 	clock = Clock(dut.clk, CLK_PERIOD, CLK_UNIT)
 	clk_task = cocotb.start_soon(clock.start()) #runs the clock "in the background" 
@@ -231,4 +233,5 @@ async def jtag_user_reg_test(dut):
 async def jtag_scan_chain_test(dut):
 	await rst(dut, start_jtag=True, start_main_clk=False)
 	await jtag_utils.rst_jtag_tap(dut)
-	await jtag_utils.test_scan_chain(dut)
+	assert(SC_CLK_DELAY/2 < TCK_PERIOD)
+	await jtag_utils.test_scan_chain(dut, dut.clk, SC_CLK_DELAY, CLK_UNIT)
