@@ -15,11 +15,7 @@ open_project $project_path
 
 
 # synth
-if { $use_gates } {
-	synth_design -top emulator -flatten_hierarchy none
-} else {
-	synth_design -top emulator
-}
+synth_design -top emulator 
 
 if { $enable_debug_core } {
 	source debug_core.tcl
