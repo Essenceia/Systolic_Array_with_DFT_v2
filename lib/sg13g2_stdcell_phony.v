@@ -103,6 +103,16 @@ module sg13g2_and4_1 (
 );
     assign X = A & B & C & D;
 endmodule
+module sg13g2_and4_2 (
+    input  wire A,
+    input  wire B,
+    input  wire C,
+    input  wire D,
+    output wire X
+);
+    assign X = A & B & C & D;
+endmodule
+
 
 // buffers
 module sg13g2_buf_1 (
@@ -408,6 +418,13 @@ endmodule
 
 // or
 module sg13g2_or2_1 (
+    input  wire A,
+    input  wire B,
+    output wire X
+);
+    assign X = A | B;
+endmodule
+module sg13g2_or2_2 (
     input  wire A,
     input  wire B,
     output wire X

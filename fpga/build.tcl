@@ -15,7 +15,7 @@ open_project $project_path
 
 
 # synth
-if { $usegates } {
+if { $use_gates } {
 	synth_design -top emulator -flatten_hierarchy none
 } else {
 	synth_design -top emulator
