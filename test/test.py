@@ -18,21 +18,24 @@ TCK_UNIT=CLK_UNIT
 TCK_PERIOD=77
 CLK_TIMEOUT_PERIOD=(CLK_PERIOD*1000)
 
+SC_CLK_DELAY=2
+
 def start_clk(dut):
 	clock = Clock(dut.clk, CLK_PERIOD, CLK_UNIT)
-	cocotb.start_soon(clock.start()) #runs the clock "in the background" 
+	clk_task = cocotb.start_soon(clock.start()) #runs the clock "in the background" 
+	return clk_task
 
 def start_jtag_clk(dut):
 	jtag_clk = Clock(dut.tck, TCK_PERIOD, TCK_UNIT)
 	cocotb.start_soon(jtag_clk.start())
 
 # Reset sequence
-async def rst(dut, ena=1, start_jtag=False):
+async def rst(dut, ena=1, start_jtag=False, start_main_clk=True):
 	dut.rst_n.value = 1
 	dut.tck.value = 0
 	dut.tms.value = "X"
 	dut.tdi.value = "X"
-	start_clk(dut)
+	clk_task = start_clk(dut)
 	if start_jtag:
 		dut.tms.value = 0
 		dut.tdi.value = 0
@@ -49,6 +52,8 @@ async def rst(dut, ena=1, start_jtag=False):
 	dut.rst_n.value = 1
 	dut.ena.value = ena
 	await ClockCycles(dut.clk,10)
+	if not(start_main_clk): 
+		assert(clk_task.cancel())
 
 async def read_res(dut):
 	res = array('B')
@@ -224,3 +229,12 @@ async def jtag_user_reg_test(dut):
 			unit = unit_next
 			first = False
 
+@cocotb.test()
+async def jtag_scan_chain_test(dut):
+	await rst(dut, start_jtag=True, start_main_clk=False)
+	await jtag_utils.rst_jtag_tap(dut)
+	assert(SC_CLK_DELAY/2 < TCK_PERIOD)
+	# read scan chain length from design localparam, will depend on verilog define and if we are using the mock scan chain
+	# present without the gate level simulation
+	sc_length = dut.DUT_SC_LENGTH.value.to_unsigned()
+	await jtag_utils.test_scan_chain(dut,sc_length,  dut.clk, SC_CLK_DELAY, CLK_UNIT)

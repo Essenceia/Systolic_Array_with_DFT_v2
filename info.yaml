@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "2x2 Systolic array with DFT v2"   
+  title:        "2x2 Systolic array with DFT and bfloat16 - v2"   
   author:       "Julia Desmazes"            
   discord:      "__essen"                         
   description:  "Second version of the 2x2 systollic array with DFT intrastructure, including bfloat16 floating point arithmetic and DFT scan chain." 
@@ -57,8 +57,8 @@ pinout:
   # Bidirectional pins
   uio[0]: "data_i[7]"
   uio[1]: "data_valid_i"
-  uio[2]: "data_mode_i"
-  uio[3]: "data_rst_addr_i"
+  uio[2]: "data_mode_i[1]"
+  uio[3]: "data_mode_i[0]"
   uio[4]: "tdi"
   uio[5]: "tms"
   uio[6]: "tdo"

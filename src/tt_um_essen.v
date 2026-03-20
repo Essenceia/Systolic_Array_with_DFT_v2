@@ -141,7 +141,18 @@ assign dft_sc_tdo = 1'bX;// output of the scan chain, not really X
 	.A(dft_sc_tdo),
 	.X(jtag_dft_sc_tdo)
 );
-`endif
+`elsif COCOTB
+`ifndef GL_SIM
+// not gate level simulation
+localparam MOCK_SC_W = 100;
+reg [MOCK_SC_W-1:0] mock_scan_chain_q;
+always @(posedge clk) begin
+	if (jtag_dft_sc_en)
+		mock_scan_chain_q <= {mock_scan_chain_q[MOCK_SC_W-2:0], jtag_dft_sc_tdi};
+end
+assign jtag_dft_sc_tdo = mock_scan_chain_q[MOCK_SC_W-1];
+`endif // GL_SIM
+`endif // SCL_sg13g2_stdcell, COCOTB
 
 jtag #(.IR_W(3), 
 	.VERSION_NUM(4'h2),// <- v2 second tapeout

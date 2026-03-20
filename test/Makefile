@@ -28,6 +28,7 @@ else
 SIM_BUILD		= sim_build/gl_cvc
 COMPILE_ARGS    += -DFUNCTIONAL
 COMPILE_ARGS    += -DSIM
+COMPILE_ARGS    += -DGL_SIM
 
 ifeq ($(PHONY_GATES),yes)
 VERILOG_SOURCES =$(PWD)/../lib/sg13g2_stdcell_phony.v
