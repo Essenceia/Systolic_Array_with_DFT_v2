@@ -29,6 +29,7 @@ project:
     - "bf16/src/bf16_mul.v"
     - "bf16/src/booth_unsigned_mul.v"
     - "bf16/src/lzc.v"
+    - "bf16/src/pmux.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
