@@ -1,9 +1,10 @@
 set project_path [lindex $argv 0]
 set bit_path [lindex $argv 1]
 set checkpoint_path [lindex $argv 2]
-if { $argc > 3 } {
-	set enable_debug_core [lindex $argv 3]
-	set debug_probes_path [lindex $argv 4]
+set use_gates [lindex $argv 3]
+if { $argc > 4 } {
+	set enable_debug_core [lindex $argv 4]
+	set debug_probes_path [lindex $argv 5]
 } else {
 	set enable_debug_core 0
 	set debug_probes_path "/tmp/dump"
@@ -12,8 +13,13 @@ puts "Implementation script called with project path $project_path, generating c
 
 open_project $project_path 
 
+
 # synth
-synth_design -top emulator
+if { $usegates } {
+	synth_design -top emulator -flatten_hierarchy none
+} else {
+	synth_design -top emulator
+}
 
 if { $enable_debug_core } {
 	source debug_core.tcl
