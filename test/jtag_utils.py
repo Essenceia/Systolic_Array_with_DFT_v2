@@ -4,12 +4,14 @@
 
 import cocotb
 from cocotb.triggers import ClockCycles
+from cocotb.types import LogicArray
 import random 
 
 EXTEST = 0
 IDCODE = 1
 SAMPLE_PRELOAD = 2
 USER_REG = 3
+SCAN_CHAIN = 4
 BYPASS = 7
 IR_L = 3 
 
@@ -315,4 +317,58 @@ async def scan_user_reg(dut, unit_addr, reg_addr, first_user_reg_read=False):
 	
 	return user_reg
 	 
+async def test_scan_chain(dut):
+	await set_ir(dut, SCAN_CHAIN)
+
+	# go to shift dr mode
+	
+	# idle 
+	set_cmd(dut,tms=True)
+	await ClockCycles(dut.tck, 1)
+   
+	# dr select
+	set_cmd(dut,tms=False)
+	await ClockCycles(dut.tck, 1)
+ 
+	# capture dr
+	set_cmd(dut,tms=False)
+	await ClockCycles(dut.tck, 1)
+   
+	# shift dr
+	x = 500
+	tdi_buffer = LogicArray('Z'*x, x)
+	tdo_buffer = LogicArray('Z'*x, x)
+	mark_buffer = LogicArray('Z'*x, x)
+	# write tdi in and tdo
+	for i in range(0, x):
+		tdi = random.randint(0,1)
+		if i != x-1:
+			tdi_buffer[i] = tdi
+		set_cmd(dut,tms=(i == x-1), tdi=(tdi == 1))
+		await ClockCycles(dut.tck, 1)
+		if ( i > 1 ) :
+			tdo_buffer[i] = dut.tdo.value
+   
+	# exit 1r
+	set_cmd(dut,tms=True)
+	await ClockCycles(dut.tck, 1)
+	tdo_buffer[x-1] = dut.tdo.value
+
+	# check bypass results, input should match output
+	cocotb.log.info("scan chain test")
+	cocotb.log.info("tdi[%d:0] %s",x-1, tdi_buffer)
+	cocotb.log.info("tdo[%d:0] %s",x-1, tdo_buffer)
+	mark_buffer[0] = 0
+	mark_buffer[1] = 1
+	cocotb.log.info("ref %s", mark_buffer)
+	#assert(tdi_buffer == tdo_buffer) 
 	 
+	# update dr
+	set_cmd(dut,tms=False)
+	await ClockCycles(dut.tck, 1)
+
+	# got back to idle
+	set_cmd(dut,tms=False)
+	await ClockCycles(dut.tck, 1)
+
+ 
