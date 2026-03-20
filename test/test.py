@@ -243,5 +243,3 @@ async def jtag_scan_chain_test(dut):
 	# present without the gate level simulation
 	sc_length = dut.DUT_SC_LENGTH.value.to_unsigned()
 	await jtag_utils.test_scan_chain(dut,sc_length,  dut.clk, SC_CLK_DELAY, CLK_UNIT)
-	cocotb.log.info(cocotb.argv)
-	cocotb.log.info(GATES)
