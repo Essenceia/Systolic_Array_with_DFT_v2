@@ -9,7 +9,7 @@ You can also include images in this folder and reference them in the markdown. E
 # Multiply and accumulate matrix multiplier ASIC with design for test infrastructure
 
 ASIC design for a 2x2 systolic matrix multiplier supporting multiply and accumulate
-operations on int8 data alongside a design for test infrastructure to help debug
+operations on bfloat16 data alongside a design for test infrastructure to help debug
 both usage and diagnose design issues in silicon.
 
 # Pinout 
@@ -20,8 +20,8 @@ This accelerator uses the following pinout:
 | ----------------- | ---------------- | ------------------------ |
 | ui[0] = tck       | uo[0] = result_o | uio[0] = data_i[7]       |
 | ui[1] = data_i[0] | uo[1] = result_o | uio[1] = data_valid_i    |
-| ui[2] = data_i[1] | uo[2] = result_o | uio[2] = data_mode_i     |
-| ui[3] = data_i[2] | uo[3] = result_o | uio[3] = data_rst_addr_i |
+| ui[2] = data_i[1] | uo[2] = result_o | uio[2] = data_mode_i[1]  |
+| ui[3] = data_i[2] | uo[3] = result_o | uio[3] = data_mode_i[0]  |
 | ui[4] = data_i[3] | uo[4] = result_o | uio[4] = tdi             |
 | ui[5] = data_i[4] | uo[5] = result_o | uio[5] = tms             |
 | ui[6] = data_i[5] | uo[6] = result_o | uio[6] = tdo             |
@@ -31,7 +31,9 @@ This accelerator uses the following pinout:
 
 # MAC 
 
-This MAC accelerator operates at up to 50MHz and is capable of reaching up to 100 MMAC/s or 200 MIOPS/s. 
+This MAC accelerator operates at up to 100MHz and is capable of reaching up to 100 MMAC/s or 200 MFLOPS/s. 
+
+:warning: The outgoing data path on IHP sg13g2 chips has only been proven upwards of 75MHz, so although we will using the maximum theoretical frequency in this discussion it might be necessary to drive this ASIC as a lower clock frequency in practice. 
 
 ## Background 
 
@@ -75,23 +77,13 @@ Each MAC unit calculates the MAC operation $c_{(t,x,y)}$, where :
 c_{(t,x,y)} = i_{(t,y)} \times w_{(x,y)} + c_{(t-1,x,y-1)}
 ```
 
-Given this accelerator was designed to operate on signed 8-bit integers, 
-but that the successive application of the 8-bit multiplication and addition 
-pushes the resulting value up to 17 bits, in order to prevent the size of the base datatype 
-from increasing with each successive MAC operation, we need to clamp it down back within the 8-bit range.
+Given this accelerator was designed to operate on 16-bit floating point numbers, 
+there is no need for an additional clamping step. 
 
-As such, the MAC unit performs an additional clamping function $clamp_{i8}$ that remaps :
-```math
-clamp_{i8}(c_{(t,x,y)}) = \begin{cases}
-   127 &\text{if } c_{(t,x,y}) > 127\\
-   c_{(t,x,y)} &\text{if } c_{(t,x,y)} \in [-128,127] \\
-    -128 &\text{if } c_{(t,x,y}) < -128\\
-\end{cases}
-```
 
 Our final full MAC operation is as follows : 
 ```math
-c_{(t,x,y)} = clamp_{i8}(i_{(t,y)} \times w_{(x,y)} + c_{(t-1,x,y-1)})
+c_{(t,x,y)} = i_{(t,y)} \times w_{(x,y)} + c_{(t-1,x,y-1)}
 ```
 
 At each MAC timestep $t+1$ :
@@ -102,14 +94,14 @@ This data streaming allows such designs to make more efficient use of data, re-u
 
 ## Throughput
 
-Assuming a pre-configured $W$ weight matrix is being reused and the accelerator is receiving a gapless stream of multiple $I$ input matrices, this MAC accelerator is capable of computing up to 100 MMAC/s or 200 MIOPS/s.
+Assuming a pre-configured $W$ weight matrix is being reused and the accelerator is receiving a gapless stream of multiple $I$ input matrices, this MAC accelerator is capable of computing up to 100 MMAC/s or 200 MFLOPS/s.
 
 ### IO Bottleneck
 
 Accelerator operations are stalled if a MAC operation has a data dependency on data that has yet to arrive. For example, calculating $r_{(0,0)}$ depends on both $i_{(0,0)}$​ and $i_{(1,0)}$​.
-In practice, each operation depends on two pieces of input data, yet our input interface being only 8 bits wide allows us to transfer only a single $i_{(x,y)}$​ per cycle.
+In practice, each operation depends on two pieces of input data, yet our input interface being only 8 bits wide allows us to transfer only a half of $i_{(x,y)}$​ per cycle.
 
-This limitation means our accelerator is actually operating at half maximum capacity due to this IO bottleneck. If the IO interface were either (a) at least 16 bits wide, or (b) 8 bits wide but operating at 100 MHz, resolving this bottleneck, our maximum throughput would be 200 MMAC/s or 400 MIOPS/s.
+This limitation means our accelerator is actually operating at a quarter of the maximum capacity due to this IO bottleneck. If the IO interface were either (a) at least 32 bits wide, or (b) 8 bits wide but operating at 400 MHz, resolving this bottleneck, our maximum throughput would be 400 MMAC/s or 800 MFLOPS/s.
 
 ## Usage 
 
@@ -123,9 +115,9 @@ This design doesn't feature on-chip SRAM and has limited on-chip memory.
 Given weights have high spatial and temporal locality, this design allows each weight to be configured per MAC unit. This configuration can be reused across multiple matrices.
 The input matrix, on the other hand, is expected to be provided on each usage.
 
-Given our input and output data buses are only 8 bits wide, for data transfers to and from the chip the matrices are flattened in the following order:
+Given our input and output data buses are only 8 bits wide, for data transfers to and from the chip the matrices are flattened in the following order, with bytes transfered in little endian:
 
-![flattened](flat.svg)
+![flat](flat.svg)
 
 Notes:
 - All references to `cycles` below are clocked according to the `clk` pin.
@@ -140,23 +132,21 @@ to reset this index using the reset sequence described below.
 The weights streaming indexes and the data streaming indexes can be reset independently, each requires a single data
 transfer cycle during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i` is set to `0` if we are resetting the `weights` indexes, `1` to reset the data indexes
+- `data_mode_i[1:0]` is set to `0x3` if we are resetting both the weight and the data indexes
 - `data_i[7:0]` is ignored
-- `data_rst_addr_i` is set to `1`
 
 #### Example
 
 In this example we are resetting both the data streaming index and the weight index back to back. 
 
-![rst configuration timing diagram](rst_waves.png)
+TODO rst_waves.png
 
 ### Configure weights
 
-Configuring the weights takes 4 data transfer cycles, during which : 
+Configuring the weights takes 8 data transfer cycles, during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i` is set to `0` indicating we are sending `weights`
+- `data_mode_i[1:0]` is set to `0x0` indicating we are sending `weights`
 - `data_i[7:0]` contains the weights
-- `data_rst_addr_i` is set to `0`
 
 #### Example 
 
@@ -168,7 +158,7 @@ W =
 2 & 3 
 \end{pmatrix} 
 ```
-![weights configuration timing diagram](wr_weights_waves.png)
+TODO wr_weights_waves.png
 
 #### Debug
 
@@ -185,19 +175,18 @@ for {set u 0} {$u <= $USER_REG_UNIT_MAX} {incr u} {
 
 For the $W$ weight matrix configured in the example above, the expected output should be : 
 ```
-read internal register 0 : 0x00 - weight
-read internal register 1 : 0x01 - weight
-read internal register 2 : 0x02 - weight
-read internal register 3 : 0x03 - weight
+read internal register 0:0 : 0x0000 - weight
+read internal register 0:1 : 0x0000 - multiplicand ( input data )
+read internal register 0:2 : 0x0000 - summand ( input data )
+read internal register 0:3 : 0x0000 - multiplication result (internal computation)
 ```
 
 ### Sending the input matrix
 
-Sending the input matrix takes 4 data transfer cycles, during which : 
+Sending the input matrix takes 8 data transfer cycles, during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i` is set to `1` indicating we are sending the input matrix
+- `data_mode_i[1:0]` is set to `0x1` indicating we are sending the input matrix
 - `data_i[7:0]` contains the input data
-- `data_rst_addr_i` is set to `0`
 
 #### Example
 
@@ -209,14 +198,17 @@ I =
 6 & 7 
 \end{pmatrix} 
 ```
-![data configuration timing diagram](wr_data_waves.png)
+TODO wr_data_waves.png
 
 ### Receiving result
 
 When receiving a result the asic will drive the following pins during 
-4 data transfer cycles : 
+8 data transfer cycles. The transfer is guarantied to be gapeless : 
 - `res_v_o` is set to `1`
 - `res_o[7:0]` contains the result of the MAC operation for a single matrix coordinate
+
+In order to start capture by the pio hardware on the raspberry pi silicon, `res_v_o` is asserted a cycle before the 
+data transfer starts. The two result streams occure back-to-back this will not occur. 
 
 #### Simple example
 
@@ -238,21 +230,21 @@ R = I \times W =
 14 & 27
 \end{pmatrix}
 ```
-![result streamout](rd_res_waves.png)
+TODO rd_res_waves.png
 
 #### Complex example 
 
-Internally, the accelerator takes at most 4 cycles to produce a result from incoming data. This accounts for incoming data latching, circulating the data through the entire systolic array, and output streaming. The accelerator moves the incoming data through the array as soon as it is available. Because of this, and since this accelerator supports gaps in the incoming data stream, if, for example, the last data transfer of $i_{(1,1)}$ ​is delayed by at least 2 cycles, then the accelerator result will start streaming out before all of the input matrix has finished streaming in.
+Internally, the accelerator takes at most 8 cycles to produce a result from incoming data. This accounts for incoming data latching, circulating the data through the entire systolic array, and output streaming. The accelerator moves the incoming data through the array as soon as it is available. Because of this, and since this accelerator supports gaps in the incoming data stream, if, for example, the last data transfer of $i_{(1,1)}$ ​is delayed by at least 2 cycles, then the accelerator result will start streaming out before all of the input matrix has finished streaming in.
 
 This is why, in the firmware (`firmware/main.c`), we set up the DMA stream to receive the data before we start sending the input matrix, as the gap between sending and getting the result is too small for the controlling MCU to perform any type of compute.
 
-![non-trivial read sequence](rd_res_complex_waves.png)
+TODO rd_res_complex_waves.png
 
 # DFT 
 
 This design embeds a JTAG for debugging the accelerator's usage by probing into internal registers and helping identify PCB issues using a boundary scan.
 
-This JTAG TAP was designed to operate at `2 MHz`, has idcode `0x1beef0d7`.
+This JTAG TAP was designed to operate at `2 MHz`, has idcode `0x2beef0d7`.
 
 Its instruction register length is `3`, and implements the following instructions:
 
@@ -262,9 +254,12 @@ Its instruction register length is `3`, and implements the following instruction
 | `IDCODE` | `0x1` | Reads JTAG TAP identifier |
 | `SAMPLE_PRELOAD` | `0x2` | Boundary scan |
 | `USER_REG` | `0x3` | Probe internal registers |
+| `SCAN_CHAIN` | `0x4` | Internal logic scan chain |
 | `BYPASS` | `0x7` | Set the TAP in bypass mode |
 
 All four standard instructions `EXTEST`, `IDCODE`, `SAMPLE_PRELOAD`, `BYPASS` conform to the standard behavior.
+
+`SCAN_CHAIN` is a private JTAG instruction used for observing the systolic array's flops state. The order of the flop chain can be found at the end of the [`.def` file](../final/tt_um_essen.def) in the definition of the `chain_0` scan chain.
 
 ## `USER_REG`
 
@@ -273,12 +268,12 @@ The data to be read is specified by loading its address in the data register dur
 1. Load the address of the next data
 2. Read the data off TDI
 
-The address and data are both `8` bits wide, though only the bottom 4 bits of the address are used.
+The address and data are both `16` bits wide, though only the bottom 4 bits of the address are used.
 
 ### Address format
 The address uses the following format:
 ```
-[ unused 7:4 ][ mac unit 3:2 ][ register id 1:0 ] 
+[ unused 15:4 ][ mac unit 3:2 ][ register id 1:0 ] 
 ```
 Register id mapping for this MAC unit gives us the current:
 
@@ -287,7 +282,7 @@ Register id mapping for this MAC unit gives us the current:
 | `0x0` | Weight (multiplier) |
 | `0x1` | Multiplicand (circulated data) |
 | `0x2` | Summand (circulated data) |
-| `0x3` | MAC operation overflow bits, used in rounding to the maximum representation range of the `int8_t`, discarded before the next MAC unit (internal MAC unit data) |
+| `0x3` | Multiplication result (internal MAC unit data) |
 
 ## Important considerations for usage 
 
@@ -313,19 +308,34 @@ openocd -f jtag/openocd.cfg
 
 Expected output:
 ```
-Open On-Chip Debugger 0.12.0+dev-02171-g11dc2a288 (2025-11-23-19:25)
+Open On-Chip Debugger 0.12.0+dev-02429-ge4c49d860 (2026-03-17-19:44)
 Licensed under GNU GPL v2
 For bug reports, read
 	http://openocd.org/doc/doxygen/bugs.html
 Info : J-Link V10 compiled Jan 30 2023 11:28:07
 Info : Hardware version: 10.10
-Info : VTarget = 3.380 V
+Info : VTarget = 3.348 V
 Info : clock speed 2000 kHz
-Info : JTAG tap: tpu.tap tap/device found: 0x1beef0d7 (mfg: 0x06b (Transwitch), part: 0xbeef, ver: 0x1)
+Info : JTAG tap: tpu.tap tap/device found: 0x2beef0d7 (mfg: 0x06b (Transwitch), part: 0xbeef, ver: 0x2)
 Warn : gdb services need one or more targets defined
-idcode : 1beef0d7
-read internal register 0:0 : 0x00 - weight
-read internal register 0:1 : 0x00 - multiplicand ( input data )
-read internal register 0:2 : 0x00 - summand ( input data )
+idcode : 2beef0d7
+read internal register 0:0 : 0x0000 - weight
+read internal register 0:1 : 0x0000 - multiplicand ( input data )
+read internal register 0:2 : 0x0000 - summand ( input data )
+read internal register 0:3 : 0x0000 - multiplication result (internal computation)
+read internal register 1:0 : 0x0000 - weight
+read internal register 1:1 : 0x0000 - multiplicand ( input data )
+read internal register 1:2 : 0x0000 - summand ( input data )
+read internal register 1:3 : 0x0000 - multiplication result (internal computation)
+read internal register 2:0 : 0x0000 - weight
+read internal register 2:1 : 0x0000 - multiplicand ( input data )
+read internal register 2:2 : 0x0000 - summand ( input data )
+read internal register 2:3 : 0x0000 - multiplication result (internal computation)
+read internal register 3:0 : 0x0000 - weight
+read internal register 3:1 : 0x0000 - multiplicand ( input data )
+read internal register 3:2 : 0x0000 - summand ( input data )
+read internal register 3:3 : 0x0000 - multiplication result (internal computation)
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
 ...
 ```
