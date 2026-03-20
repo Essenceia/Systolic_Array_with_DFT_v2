@@ -25,7 +25,7 @@ a low area budget.
 These choices are : 
 - round toward zero rounding only
 - no subnormal support, all subnormals will be clamped to 0
-- no $\pm \infty$ support
+- no $\pm \infty$ or $NaN$ support
 
 For more information refer to the [bfloat repository](https://github.com/Essenceia/BFloat16)
 
