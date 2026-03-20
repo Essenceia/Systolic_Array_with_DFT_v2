@@ -23,9 +23,6 @@ BSC_LENGTH = PIN_IN_N + PIN_OUT_N
 
 USER_REG_W = 8
 
-# Scan chain lenght 
-SC_LENGTH = 100 # mock size
-
 def set_cmd(dut,tms=False, tdi=False):
 	if (tms):
 	    dut.tms.value = 1
@@ -327,7 +324,7 @@ async def manual_scan_chain_clk_cycle(logic_clk, logic_clk_delay, logic_clk_unit
 	await cocotb.triggers.Timer(logic_clk_delay/2, unit=logic_clk_unit)
 	logic_clk.value = 0;
  
-async def test_scan_chain(dut, logic_clk, logic_clk_delay, logic_clk_unit):
+async def test_scan_chain(dut, sc_length, logic_clk, logic_clk_delay, logic_clk_unit):
 	await set_ir(dut, SCAN_CHAIN)
 
 	# go to shift dr mode
@@ -345,7 +342,7 @@ async def test_scan_chain(dut, logic_clk, logic_clk_delay, logic_clk_unit):
 	await ClockCycles(dut.tck, 1)
    
 	# shift dr
-	x = (SC_LENGTH * 2)+2
+	x = (sc_length * 2)+2
 	tdi_buffer = LogicArray('Z'*x, x)
 	tdo_buffer = LogicArray('Z'*x, x)
 	# write tdi in and tdo
@@ -371,9 +368,9 @@ async def test_scan_chain(dut, logic_clk, logic_clk_delay, logic_clk_unit):
 	cocotb.log.debug("tdi[%d:0] %s",x-1, tdi_buffer)
 	cocotb.log.debug("tdo[%d:0] %s",x-1, tdo_buffer)
 	cocotb.log.info("partial buffers:")
-	cocotb.log.info("tdi[%d:0]   %s",SC_LENGTH-1, tdi_buffer[SC_LENGTH-1:0])
-	cocotb.log.info("tdo[%d:%d] %s",SC_LENGTH*2-2,SC_LENGTH-1, tdo_buffer[SC_LENGTH*2-2:SC_LENGTH-1])
-	assert(tdi_buffer[SC_LENGTH-1:0] == tdo_buffer[SC_LENGTH*2-2:SC_LENGTH-1]) 
+	cocotb.log.info("tdi[%d:0]   %s",sc_length-1, tdi_buffer[sc_length-1:0])
+	cocotb.log.info("tdo[%d:%d] %s",sc_length*2-2,sc_length-1, tdo_buffer[sc_length*2-2:sc_length-1])
+	assert(tdi_buffer[sc_length-1:0] == tdo_buffer[sc_length*2-2:sc_length-1]) 
 	 
 	# update dr
 	set_cmd(dut,tms=False)

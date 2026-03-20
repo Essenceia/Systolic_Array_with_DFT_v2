@@ -234,4 +234,8 @@ async def jtag_scan_chain_test(dut):
 	await rst(dut, start_jtag=True, start_main_clk=False)
 	await jtag_utils.rst_jtag_tap(dut)
 	assert(SC_CLK_DELAY/2 < TCK_PERIOD)
-	await jtag_utils.test_scan_chain(dut, dut.clk, SC_CLK_DELAY, CLK_UNIT)
+	# read scan chain length from design localparam, will depend on verilog define and if we are using the mock scan chain
+	# present without the gate level simulation
+	sc_length = dut.DUT_SC_LENGTH.value.to_unsigned()
+	cocotb.log.info("sc length %d %s", sc_length, type(sc_length))
+	await jtag_utils.test_scan_chain(dut,sc_length,  dut.clk, SC_CLK_DELAY, CLK_UNIT)

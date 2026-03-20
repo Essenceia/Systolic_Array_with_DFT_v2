@@ -15,7 +15,11 @@ module tb ();
 		$dumpvars(0, tb);
 		#1;
 	end
-
+`ifdef GL_SIM
+	localparam int DUT_SC_LENGTH = 341; // gotten from def
+`else
+	localparam int DUT_SC_LENGTH = 100; // mock 
+`endif
 	// Wire up the inputs and outputs:
 	reg clk;
 	reg rst_n;
