@@ -367,9 +367,9 @@ async def test_scan_chain(dut, sc_length, logic_clk, logic_clk_delay, logic_clk_
 	cocotb.log.debug("scan chain test\nfull buffers:")
 	cocotb.log.debug("tdi[%d:0] %s",x-1, tdi_buffer)
 	cocotb.log.debug("tdo[%d:0] %s",x-1, tdo_buffer)
-	cocotb.log.info("partial buffers:")
-	cocotb.log.info("tdi[%d:0]   %s",sc_length-1, tdi_buffer[sc_length-1:0])
-	cocotb.log.info("tdo[%d:%d] %s",sc_length*2-2,sc_length-1, tdo_buffer[sc_length*2-2:sc_length-1])
+	cocotb.log.debug("partial buffers:")
+	cocotb.log.debug("tdi[%d:0]   %s",sc_length-1, tdi_buffer[sc_length-1:0])
+	cocotb.log.debug("tdo[%d:%d] %s",sc_length*2-2,sc_length-1, tdo_buffer[sc_length*2-2:sc_length-1])
 	assert(tdi_buffer[sc_length-1:0] == tdo_buffer[sc_length*2-2:sc_length-1]) 
 	 
 	# update dr
