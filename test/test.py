@@ -14,7 +14,10 @@ import asyncio
 from array import array 
 
 import os
-GATES = os.environ["GATES"].lower().strip()
+if "GATES" in os.environ:
+	GATES = os.environ["GATES"].lower().strip()
+else:
+	GATES = ""
 
 CLK_UNIT="us"
 CLK_PERIOD=10
