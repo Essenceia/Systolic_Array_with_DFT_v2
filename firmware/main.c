@@ -66,9 +66,6 @@ int main() {
 	size_t pl = DATA_W;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));
 
-	bfloat16_t a = {.s=0, .e=0, .m=0};
-	printf("bfloat %d", a.e);
-
 	/* debug */
 	pio_hw_t * debug_pio = PIO_INSTANCE(1);
 	dma_debug_hw_t *debug_dma = dma_debug_hw;
@@ -131,13 +128,13 @@ int main() {
 	send_data_rst(p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 
 	while (true) {
-		//send_data(d, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		send_data(d, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 		
 		sleep_ms(DELAY_MS);
 		led = led ? 0:1;
+		pio_sm_put_blocking(pio[PIO_LED], sm[PIO_LED], led);
 		
 		/*
-		pio_sm_put_blocking(pio[PIO_LED], sm[PIO_LED], led);
 		setup_rd_dma_res_stream(rd_dma_chan, sizeof(res_buffer), res_buffer, sizeof(res_buffer), pio[PIO_RD], sm[PIO_RD]);
 		send_data(d, false, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 		read_res(res, sizeof(res), res_buffer, sizeof(res_buffer), rd_dma_chan);

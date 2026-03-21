@@ -23,7 +23,6 @@ module emulator #(
 	// Pmod B
 	input  wire               data_v_i,
 	input  wire [1:0]         data_mode_i,
-	input  wire               data_rst_addr_i,
 	
 	output wire               res_v_o,
 	
@@ -39,7 +38,6 @@ wire pll_lock;
 reg  pll_lock_q;
 wire ena;
 wire rst_async;
-wire error;
  
 wire [7:0] ui_in;
 wire [7:0] uio_in; 
