@@ -1,7 +1,9 @@
-# Systollic Array with DFT v2 
+# Systollic Array with DFT and Floating Point math v2 
 
-Second iteration on the systollic array targetting IHP 180 nm `sg13g2` 
+Second iteration on the systollic array targetting IHP 130 nm `sg13g2` 
 open PDK, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
+
+![floorplan](docs/floorplan.webp) 
 
 ## Improvements on v1 
 
