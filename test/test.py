@@ -65,11 +65,14 @@ async def rst(dut, ena=1, start_jtag=False, start_main_clk=True):
 async def read_res(dut):
 	res = array('B')
 	ret = array('H')#return type, convert byte to uint16
-	   
+		
+	# result streamout is guarantied to be gapeless
+	while (dut.result_v.value != 1):
+	    await ClockCycles(dut.clk, 1)
+	await ClockCycles(dut.clk, 1)
 	while (len(res) != mac_utils.RES_SIZE):
-		if (dut.result_v.value == 1):
-			x = dut.uo_out.value
-			res.append(x)
+		x = dut.uo_out.value
+		res.append(x)
 		await ClockCycles(dut.clk, 1)
 	ret.frombytes(res)
 	return ret
@@ -105,7 +108,7 @@ async def simple_mac_test(dut):
 		
 	# send data
 	write_task = cocotb.start_soon(mac_utils.write_config(dut, I , weight=False))
-   
+	 
 	await write_task
 	await comp_task 
 		
@@ -132,7 +135,7 @@ async def random_mac_test(dut):
 		
 		# send data
 		write_task = cocotb.start_soon(mac_utils.write_config(dut, I , weight=False))
-   
+	 
 		await write_task
 		await comp_task 
 
@@ -156,7 +159,7 @@ async def random_mac_reuse_weights_test(dut):
 			comp_task = cocotb.start_soon(compare_res(dut, W, I))
 			# write data
 			write_task = cocotb.start_soon(mac_utils.write_config(dut, I , weight=False))
-   
+	 
 			await write_task
 			await comp_task 
 
@@ -223,7 +226,7 @@ async def jtag_user_reg_test(dut):
 
 		# send weights 
 		await mac_utils.write_config(dut, W, weight=True)
-	   
+		 
 		for _ in range(0, 10): 
 			first = True
 			unit_next = random.randint(0,3)
@@ -245,4 +248,4 @@ async def jtag_scan_chain_test(dut):
 	# read scan chain length from design localparam, will depend on verilog define and if we are using the mock scan chain
 	# present without the gate level simulation
 	sc_length = dut.DUT_SC_LENGTH.value.to_unsigned()
-	await jtag_utils.test_scan_chain(dut,sc_length,  dut.clk, SC_CLK_DELAY, CLK_UNIT)
+	await jtag_utils.test_scan_chain(dut,sc_length,	dut.clk, SC_CLK_DELAY, CLK_UNIT)
