@@ -25,7 +25,7 @@ WAIVER_FILE := waiver.vlt
 GATE_PHONY_LIB:= lib
 IMPLEM_DIR := final
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl sc_extract
 
 ########
 # Lint #
@@ -97,7 +97,20 @@ sdf:
 def:
 endif
 
-gl: gates sdf def 
+gl: gates sdf def sc_extract 
+
+#########################
+# Scan chain extraction #
+#########################
+# Extract scan chain when def file is updated to make it simpler
+# for parsing by openocd
+
+start_line:=$(shell grep -n "+ ORDERED" $(IMPLEM_DIR)/$(PROJET_NAME).def | awk -F: '{print $$1 + 1}')
+end_line:=$(shell grep -n "+ PARTITION" $(IMPLEM_DIR)/$(PROJET_NAME).def | awk -F: '{print $$1 - 1}')
+
+sc_extract: $(IMPLEM_DIR)/$(PROJET_NAME).def
+	echo "$(start_line) - $(end_line)"
+	$(shell sed -n '$(start_line),$(end_line)p' $< > $(IMPLEM_DIR)/$(PROJET_NAME)_scan_chain.txt)
 
 #############
 # Testbench #
