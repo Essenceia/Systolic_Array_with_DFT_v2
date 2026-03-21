@@ -3,7 +3,7 @@
 Second iteration on the systollic array targetting IHP 130 nm `sg13g2` 
 open PDK, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
 
-![floorplan](docs/floorplan.webp) 
+![floorplan](docs/floorplan.png) 
 
 ## Improvements on v1 
 
