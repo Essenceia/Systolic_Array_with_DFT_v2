@@ -98,7 +98,7 @@ sdf:
 def:
 endif
 
-gl: gates sdf def sc_extract 
+gl: gates sdf def sc_extract submit
 
 #########################
 # Scan chain extraction #
