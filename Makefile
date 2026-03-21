@@ -24,8 +24,9 @@ DEFINES := $(if $(wave),wave=1)
 WAIVER_FILE := waiver.vlt
 GATE_PHONY_LIB:= lib
 IMPLEM_DIR := final
+SUBMIT_PATH:=$(IMPLEM_DIR)/analog_submission
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl sc_extract
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl sc_extract submit
 
 ########
 # Lint #
@@ -113,6 +114,24 @@ sc_extract: $(IMPLEM_DIR)/$(PROJET_NAME).def def
 	echo "$(start_line) - $(end_line)"
 	$(shell sed -n '$(start_line),$(end_line)p' $< > $(IMPLEM_DIR)/$(PROJET_NAME)_scan_chain.txt)
 
+#############################################
+# Prepare submission via analog backchannel #
+#############################################
+# I swear this is totally legal, I think 
+
+ifneq ($(LIBRELANE_FINAL),)
+SUBMIT_IMPLEM_RTL_PATH:=$(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v
+SUBMIT_IMPLEM_GDS_PATH:=$(LIBRELANE_FINAL)/gds/$(PROJET_NAME).gds
+SUBMIT_IMPLEM_LEF_PATH:=$(LIBRELANE_FINAL)/lef/$(PROJET_NAME).lef
+submit:
+	cp $(SUBMIT_IMPLEM_GDS_PATH) $(SUBMIT_PATH)/gds/.
+	cp $(SUBMIT_IMPLEM_LEF_PATH) $(SUBMIT_PATH)/lef/.
+	cp $(SUBMIT_IMPLEM_RTL_PATH) $(SUBMIT_PATH)/project.v
+		
+else 
+submit: 
+	$(error "Missing implementation, what are you doing ?")
+endif
 #############
 # Testbench #
 #############
