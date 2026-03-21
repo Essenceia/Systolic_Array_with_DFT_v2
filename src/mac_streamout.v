@@ -77,7 +77,7 @@ end
 // want to push output GPIO Fmax
 reg out_valid_q; 
 always @(posedge clk)
-	out_valid_q <= mv_gather_to_stream_next | |stream_idx_next; // valid is asserted a cycle before data start being sent 
+	out_valid_q <= mv_gather_to_stream_next | mv_gather_to_stream_q | |stream_idx_next; // valid is asserted a cycle before data start being sent 
 
 // output 
 assign valid_o = out_valid_q;

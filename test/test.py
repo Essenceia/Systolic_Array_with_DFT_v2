@@ -73,6 +73,7 @@ async def read_res(dut):
 	while (len(res) != mac_utils.RES_SIZE):
 		x = dut.uo_out.value
 		res.append(x)
+		assert(dut.result_v.value == 1) 
 		await ClockCycles(dut.clk, 1)
 	ret.frombytes(res)
 	return ret
