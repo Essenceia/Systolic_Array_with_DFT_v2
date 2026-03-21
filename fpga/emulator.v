@@ -48,9 +48,12 @@ wire [7:0] uo_out;
 wire [7:0] uio_out;
 wire [7:0] uio_oe;
 
-reg [PMOD_W-1:0] data_bus_q, data_q;
-reg [1:0]        data_mode_bus_q, data_mode_q;
-reg              data_v_bus_q, data_v_q;
+reg [PMOD_W-1:0] data_bus_q;
+reg [1:0]        data_mode_bus_q;
+reg              data_v_bus_q;
+(* MARK_DEBUG = "true" *)reg [PMOD_W-1:0] data_q;
+(* MARK_DEBUG = "true" *)reg              data_v_q;
+(* MARK_DEBUG = "true" *)reg [1:0]        data_mode_q;
 
 wire [PMOD_W-1:0] res;
 wire res_v;
