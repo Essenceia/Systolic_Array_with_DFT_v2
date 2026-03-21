@@ -11,7 +11,7 @@
   ],
   "FALLBACK_SDC_FILE": "dir::project.sdc",
   "SYNTH_MUL_BOOTH": "True",
-  "SYNTH_AUTONAME": "False",
+  "SYNTH_AUTONAME": "True",
   "SYNTH_HIERARCHY_MODE": "flatten",
   "RUN_POST_GPL_DESIGN_REPAIR":"True",
   "RUN_POST_GRT_DESIGN_REPAIR":"True",
