@@ -108,7 +108,8 @@ gl: gates sdf def sc_extract
 start_line:=$(shell grep -n "+ ORDERED" $(IMPLEM_DIR)/$(PROJET_NAME).def | awk -F: '{print $$1 + 1}')
 end_line:=$(shell grep -n "+ PARTITION" $(IMPLEM_DIR)/$(PROJET_NAME).def | awk -F: '{print $$1 - 1}')
 
-sc_extract: $(IMPLEM_DIR)/$(PROJET_NAME).def
+# make def a dependancy of this receipe to guaranty it is called AFTER def
+sc_extract: $(IMPLEM_DIR)/$(PROJET_NAME).def def
 	echo "$(start_line) - $(end_line)"
 	$(shell sed -n '$(start_line),$(end_line)p' $< > $(IMPLEM_DIR)/$(PROJET_NAME)_scan_chain.txt)
 
