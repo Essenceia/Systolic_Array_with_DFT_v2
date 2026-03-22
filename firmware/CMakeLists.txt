@@ -13,8 +13,8 @@ FILE(GLOB c_code_src *.c *.h)
 FILE(GLOB pio_code_src *.pio)
 
 # define debug macros to remove checks 
-set(DEBUG_NO_CHECK 1) 
-
+add_definitions(-DDEBUG_NO_CHECK=1)
+ 
 # debug 
 set(PICO_DEOPTIMIZED_DEBUG 1)
 set(CMAKE_BUILD_TYPE Debug)

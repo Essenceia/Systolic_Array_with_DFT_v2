@@ -7,7 +7,8 @@ rd:
 	jmp pin rd
 .wrap_target
 loop:
-	jmp pin rd
+	irq wait 4	
+	jmp pin rd 
 .wrap
 
 % c-sdk {
