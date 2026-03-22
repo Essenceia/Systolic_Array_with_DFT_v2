@@ -1,7 +1,7 @@
 BUILD_DIR:=artifact
 PROJECT_NAME:=mac_asic_firmeware
 SRC:=$(wildcard *.c) $(wildcard *.h) $(wildcard *.pio)
-
+GDB_INIT_PATH:=dec
 # GDB server config, if variable is not defined when calling `make gdb` use localhost as default
 #ifndef GDB_SERVER_ADDR
 GDB_SERVER_ADDR:=192.168.0.120
@@ -30,7 +30,7 @@ debug:
 
 #start gdb, hook up to debug server started by openocd
 gdb:
-	gdb -ex "target remote ${GDB_SERVER_ADDR}:${GDB_SERVER_PORT}" ${BUILD_DIR}/${PROJECT_NAME}.elf
+	gdb -ix $(GDB_INIT_PATH)/.gdbinit -ex "target remote ${GDB_SERVER_ADDR}:${GDB_SERVER_PORT}" ${BUILD_DIR}/${PROJECT_NAME}.elf
 
 clean:
 	yes | rm -rf ./${BUILD_DIR}

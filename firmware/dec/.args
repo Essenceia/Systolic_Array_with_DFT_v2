@@ -1,0 +1,1 @@
+nm_src='prj/rpi2040.mk' nm_prj='rpi2040' nm_dst_dir='.' nm_package='' nm_archive='' nm_dst_mk='Makefile' nm_bd='build' nm_hosts='linux-apt linux-pacman' nm_tgts='arm64-linux-user-gcc opengl ncurses' nm_dtgts='arm64-linux-user-gcc opengl ncurses' nm_dprfs='o0 debug warn1 sanitize profile ' all
