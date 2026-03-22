@@ -37,9 +37,9 @@
 #define macro_str(x) #x
 
 #define PICO_SYS_CLK_HW              200000000   // 200 MHz
-#define BUS_PIO_CLK_FREQ_HZ  (float)  80000000.0 //  80 MHz
-#define LED_PIO_CLK_FREQ_HZ  (float)  80000000.0 //  80 MHz
-#define DATA_PIO_CLK_FREQ_HZ (float)  80000000.0 //  80 MHz
+#define BUS_PIO_CLK_FREQ_HZ  (float)  20000000.0 //  20 MHz
+#define LED_PIO_CLK_FREQ_HZ  (float)  20000000.0 //  20 MHz
+#define DATA_PIO_CLK_FREQ_HZ (float)  20000000.0 //  20 MHz
 
 #define _DMA_BASE (uint32_t) 0x50000000
 #define TC_OFF   (uint32_t) 0x008
