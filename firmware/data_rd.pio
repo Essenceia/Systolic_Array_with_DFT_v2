@@ -2,13 +2,14 @@
 
 init:
 	jmp loop
+rd_test:
+	wait 1 irq 4	
 rd:
 	in pins, 8
 	jmp pin rd
 .wrap_target
 loop:
-	irq wait 4	
-	jmp pin rd 
+	jmp pin rd_test
 .wrap
 
 % c-sdk {
