@@ -3,10 +3,10 @@
 from ns import ns
 
 ns.reg_mods["DMA"] = {
-	"CH0_WRITE_ADDR" : (0x0, 0x20, {
+	"CH0_READ_ADDR" : (0x0, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH0_READ_ADDR" : (0x4, 0x20, {
+	"CH0_WRITE_ADDR" : (0x4, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH0_TRANS_COUNT" : (0x8, 0x20, {
@@ -111,10 +111,10 @@ ns.reg_mods["DMA"] = {
 	"CH0_AL3_READ_ADDR" : (0x3c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH1_WRITE_ADDR" : (0x40, 0x20, {
+	"CH1_READ_ADDR" : (0x40, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH1_READ_ADDR" : (0x44, 0x20, {
+	"CH1_WRITE_ADDR" : (0x44, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH1_TRANS_COUNT" : (0x48, 0x20, {
@@ -219,10 +219,10 @@ ns.reg_mods["DMA"] = {
 	"CH1_AL3_READ_ADDR" : (0x7c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH2_WRITE_ADDR" : (0x80, 0x20, {
+	"CH2_READ_ADDR" : (0x80, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH2_READ_ADDR" : (0x84, 0x20, {
+	"CH2_WRITE_ADDR" : (0x84, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH2_TRANS_COUNT" : (0x88, 0x20, {
@@ -327,10 +327,10 @@ ns.reg_mods["DMA"] = {
 	"CH2_AL3_READ_ADDR" : (0xbc, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH3_WRITE_ADDR" : (0xc0, 0x20, {
+	"CH3_READ_ADDR" : (0xc0, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH3_READ_ADDR" : (0xc4, 0x20, {
+	"CH3_WRITE_ADDR" : (0xc4, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH3_TRANS_COUNT" : (0xc8, 0x20, {
@@ -435,10 +435,10 @@ ns.reg_mods["DMA"] = {
 	"CH3_AL3_READ_ADDR" : (0xfc, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH4_WRITE_ADDR" : (0x100, 0x20, {
+	"CH4_READ_ADDR" : (0x100, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH4_READ_ADDR" : (0x104, 0x20, {
+	"CH4_WRITE_ADDR" : (0x104, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH4_TRANS_COUNT" : (0x108, 0x20, {
@@ -543,10 +543,10 @@ ns.reg_mods["DMA"] = {
 	"CH4_AL3_READ_ADDR" : (0x13c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH5_WRITE_ADDR" : (0x140, 0x20, {
+	"CH5_READ_ADDR" : (0x140, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH5_READ_ADDR" : (0x144, 0x20, {
+	"CH5_WRITE_ADDR" : (0x144, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH5_TRANS_COUNT" : (0x148, 0x20, {
@@ -651,10 +651,10 @@ ns.reg_mods["DMA"] = {
 	"CH5_AL3_READ_ADDR" : (0x17c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH6_WRITE_ADDR" : (0x180, 0x20, {
+	"CH6_READ_ADDR" : (0x180, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH6_READ_ADDR" : (0x184, 0x20, {
+	"CH6_WRITE_ADDR" : (0x184, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH6_TRANS_COUNT" : (0x188, 0x20, {
@@ -759,10 +759,10 @@ ns.reg_mods["DMA"] = {
 	"CH6_AL3_READ_ADDR" : (0x1bc, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH7_WRITE_ADDR" : (0x1c0, 0x20, {
+	"CH7_READ_ADDR" : (0x1c0, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH7_READ_ADDR" : (0x1c4, 0x20, {
+	"CH7_WRITE_ADDR" : (0x1c4, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH7_TRANS_COUNT" : (0x1c8, 0x20, {
@@ -867,10 +867,10 @@ ns.reg_mods["DMA"] = {
 	"CH7_AL3_READ_ADDR" : (0x1fc, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH8_WRITE_ADDR" : (0x200, 0x20, {
+	"CH8_READ_ADDR" : (0x200, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH8_READ_ADDR" : (0x204, 0x20, {
+	"CH8_WRITE_ADDR" : (0x204, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH8_TRANS_COUNT" : (0x208, 0x20, {
@@ -975,10 +975,10 @@ ns.reg_mods["DMA"] = {
 	"CH8_AL3_READ_ADDR" : (0x23c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH9_WRITE_ADDR" : (0x240, 0x20, {
+	"CH9_READ_ADDR" : (0x240, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH9_READ_ADDR" : (0x244, 0x20, {
+	"CH9_WRITE_ADDR" : (0x244, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH9_TRANS_COUNT" : (0x248, 0x20, {
@@ -1083,10 +1083,10 @@ ns.reg_mods["DMA"] = {
 	"CH9_AL3_READ_ADDR" : (0x27c, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH10_WRITE_ADDR" : (0x280, 0x20, {
+	"CH10_READ_ADDR" : (0x280, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH10_READ_ADDR" : (0x284, 0x20, {
+	"CH10_WRITE_ADDR" : (0x284, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH10_TRANS_COUNT" : (0x288, 0x20, {
@@ -1191,10 +1191,10 @@ ns.reg_mods["DMA"] = {
 	"CH10_AL3_READ_ADDR" : (0x2bc, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH11_WRITE_ADDR" : (0x2c0, 0x20, {
+	"CH11_READ_ADDR" : (0x2c0, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
-	"CH11_READ_ADDR" : (0x2c4, 0x20, {
+	"CH11_WRITE_ADDR" : (0x2c4, 0x20, {
 		"ADDR" : (0x0, 0x20), 
 	}),
 	"CH11_TRANS_COUNT" : (0x2c8, 0x20, {
