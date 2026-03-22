@@ -55,9 +55,9 @@ reg              data_v_bus_q;
 (* MARK_DEBUG = "true" *)reg              data_v_q;
 (* MARK_DEBUG = "true" *)reg [1:0]        data_mode_q;
 
-wire [PMOD_W-1:0] res;
-wire res_v;
-reg  [PMOD_W-1:0] res_bus_q;
+(* MARK_DEBUG = "true" *)wire [PMOD_W-1:0] res;
+(* MARK_DEBUG = "true" *)wire              res_v;
+reg [PMOD_W-1:0] res_bus_q;
 reg              res_v_bus_q;
 reg [PMOD_W-1:0] res_bus_d2_q;
 reg              res_v_bus_d2_q;
@@ -128,7 +128,8 @@ assign led_o[1] = ena;
 assign led_o[2] = clk_ibuf;
 assign led_o[3] = pll_lock_q; 
 
-assign led_o[11:4] = data_q;
+assign led_o[10:4] = res_bus_q[6:0];
+assign led_o[11]   = res_v_bus_q;
 
 assign led_o[12]    = tck;
 assign led_o[13]    = tdi;
