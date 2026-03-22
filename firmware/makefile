@@ -21,6 +21,7 @@ build: setup ${SRC}
 	PROJECT_NAME=${PROJECT_NAME} cmake --build ${BUILD_DIR} --target ${PROJECT_NAME}
 	
 # using default baudrate
+# ctrl-A + ctrl-X to exit
 serial:
 	picocom -q /dev/ttyACM0
 		

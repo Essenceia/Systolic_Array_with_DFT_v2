@@ -30,6 +30,7 @@ target_sources(${project_name} PRIVATE ${c_code_src})
 target_link_libraries(${project_name}
 	pico_stdlib
 	pico_float_compiler
+	pico_rand
 	hardware_pio
 	hardware_clocks
 	hardware_timer

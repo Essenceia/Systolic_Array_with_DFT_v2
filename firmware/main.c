@@ -58,12 +58,14 @@ int main() {
 
 	uint8_t res_buffer[DATA_W];
     data_t res;
+	data_t weight; 
 	data_t sent_data; 
-	sent_data.bf[0] = f32_to_bf16(0.0);
-	sent_data.bf[1] = f32_to_bf16(1.0);
-	sent_data.bf[2] = f32_to_bf16(2.0);
-	sent_data.bf[3] = f32_to_bf16(3.0);
-	
+	// identity matrix for ease of checking
+	weight.bf[0] = f32_to_bf16(1.0);
+	weight.bf[1] = f32_to_bf16(0.0);
+	weight.bf[2] = f32_to_bf16(0.0);
+	weight.bf[3] = f32_to_bf16(1.0);
+
 	size_t pl = DATA_W;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));
 
@@ -130,7 +132,8 @@ int main() {
 
 	while (true) {
 		// weight config
-		send_data(&sent_data, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		send_data(&weight, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		printf("iteration %d\nweight %f %f %f %f\n", cnt, bf16_to_f32(weight.bf[0]), bf16_to_f32(weight.bf[1]), bf16_to_f32(weight.bf[2]), bf16_to_f32(weight.bf[3]));
 		
 		/*
 		sleep_ms(DELAY_MS);
@@ -139,9 +142,18 @@ int main() {
 		*/
 
 		// send data
+		// funky data to send
+		sent_data.bf[0] = rand_bf16();
+		sent_data.bf[1] = rand_bf16();
+		sent_data.bf[2] = rand_bf16();
+		sent_data.bf[3] = rand_bf16();
 		setup_rd_dma_res_stream(rd_dma_chan, sizeof(res), res_buffer, sizeof(res_buffer), pio[PIO_RD], sm[PIO_RD]);
 		send_data(&sent_data, false, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		printf("data  %f %f %f %f\n", bf16_to_f32(sent_data.bf[0]), bf16_to_f32(sent_data.bf[1]), bf16_to_f32(sent_data.bf[2]), bf16_to_f32(sent_data.bf[3]));
+		
 		read_res(&res, res_buffer, sizeof(res_buffer), rd_dma_chan);
+
+		printf("result %f %f %f %f\n", bf16_to_f32(res.bf[0]), bf16_to_f32(res.bf[1]), bf16_to_f32(res.bf[2]), bf16_to_f32(res.bf[3]));
 		cnt++;
     }
 }
