@@ -141,7 +141,7 @@ def _reg_dec(blk, mod, reg, blk_nam, reg_nam, reg_bin):
     # Read memory.
     if reg_bin is None:
         print("Decoding {}.{} from memory.".format(blk_nam, reg_nam))
-        reg_bin = int(gdb.parse_and_eval("*(u" + str(size) + " *) " + hex(blk[1] + reg[0])))
+        reg_bin = int(gdb.parse_and_eval("*(uint" + str(size) + "_t *) " + hex(blk[1] + reg[0])))
     else:
         print(("Decoding {}.{} with value {:0"+str(int(size / 4)) +"x}").format(blk_nam, reg_nam, reg_bin))
     print(("{}.{} (0x{:x}) : 0x{:0"+str(int(size / 4)) + "x}").format(blk_nam, reg_nam, blk[1] + reg[0], reg_bin))
