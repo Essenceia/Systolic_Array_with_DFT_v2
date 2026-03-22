@@ -2,6 +2,8 @@
 #include "hardware/dma.h"
 #include <string.h> 
 
+#define DMA_TRANSFER_W ((size_t)4)
+
 /* init dma for hash reads from the RX FIFO to memory 
  * writes using 32b bursts ( size of the PIO RX FIFO )
  */
@@ -20,9 +22,9 @@ uint init_rd_dma_channel(PIO pio, uint sm){
 }
 
 void setup_rd_dma_res_stream(uint dma_chan, size_t l, uint8_t* buffer, size_t bl, PIO pio, uint sm){
-	hard_assert(l % PIO_FIFO_W == 0);
-	size_t tc = l;
-	hard_assert(tc <= bl*PIO_FIFO_W);
+	hard_assert(l % DMA_TRANSFER_W == 0);
+	size_t tc = l/DMA_TRANSFER_W;
+	hard_assert(tc*DMA_TRANSFER_W <= bl);
 	hard_assert(tc);
 	hard_assert(buffer);
 	#ifndef DEBUG_NO_CHECK
