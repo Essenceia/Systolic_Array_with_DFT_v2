@@ -70,11 +70,13 @@ IBUF m_ibuf_clk(
 
 // Global clock based on bus clock, using the same frequency
 // using the inherent jitter filtering capability of the PLL
-// and phase locked on bus clokc
+// and phase locked on bus clock
+
+
 PLLE2_BASE #(
-   .CLKFBOUT_MULT(25),        
+   .CLKFBOUT_MULT(40),        
    .CLKIN1_PERIOD(50.0),      
-   .CLKOUT0_DIVIDE(25),
+   .CLKOUT0_DIVIDE(40),
    .DIVCLK_DIVIDE(1)
 ) m_global_clk_pll (
    .CLKFBIN(clk_pll_feedback),
