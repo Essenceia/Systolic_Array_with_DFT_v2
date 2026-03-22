@@ -36,8 +36,8 @@ void send_data(data_t *data, bool is_weight,  pinout_t *p, size_t pl, uint dma_c
 
 	dma_channel_wait_for_finish_blocking(dma_chan); // wait for dma channel to be empty, else will overwrite
 	start_wr_dma_pinout_stream(p, DATA_W, dma_chan, pio, sm);
-	/*dma_channel_wait_for_finish_blocking(dma_chan);
-	while(pio_sm_get_tx_fifo_level(pio, sm)!=0){}*/
+	dma_channel_wait_for_finish_blocking(dma_chan);
+	while(pio_sm_get_tx_fifo_level(pio, sm)!=0){}
 }
 
 

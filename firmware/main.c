@@ -52,16 +52,17 @@ int main() {
 	uint sm[PIO_N];
 	uint offset[PIO_N];
 	float clk_div;
-	bool s = true; 
+	bool s = true;
+	uint cnt = 0; 
 	uint led = 1;
 
-	uint8_t res_buffer[4*DATA_W];
-    uint8_t res[DATA_W];
-	data_t *d = (data_t*) malloc(sizeof(data_t));
-	d->bf[0] = f32_to_bf16(0.0);
-	d->bf[1] = f32_to_bf16(1.0);
-	d->bf[2] = f32_to_bf16(2.0);
-	d->bf[3] = f32_to_bf16(3.0);
+	uint8_t res_buffer[DATA_W];
+    data_t res;
+	data_t sent_data; 
+	sent_data.bf[0] = f32_to_bf16(0.0);
+	sent_data.bf[1] = f32_to_bf16(1.0);
+	sent_data.bf[2] = f32_to_bf16(2.0);
+	sent_data.bf[3] = f32_to_bf16(3.0);
 	
 	size_t pl = DATA_W;
 	pinout_t *p = (pinout_t*)malloc(pl * sizeof(pinout_t));
@@ -128,16 +129,19 @@ int main() {
 	send_data_rst(p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 
 	while (true) {
-		send_data(d, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		// weight config
+		send_data(&sent_data, true, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
 		
+		/*
 		sleep_ms(DELAY_MS);
 		led = led ? 0:1;
 		pio_sm_put_blocking(pio[PIO_LED], sm[PIO_LED], led);
-		
-		/*
-		setup_rd_dma_res_stream(rd_dma_chan, sizeof(res_buffer), res_buffer, sizeof(res_buffer), pio[PIO_RD], sm[PIO_RD]);
-		send_data(d, false, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
-		read_res(res, sizeof(res), res_buffer, sizeof(res_buffer), rd_dma_chan);
 		*/
+
+		// send data
+		setup_rd_dma_res_stream(rd_dma_chan, sizeof(res), res_buffer, sizeof(res_buffer), pio[PIO_RD], sm[PIO_RD]);
+		send_data(&sent_data, false, p, pl, wr_dma_chan, pio[PIO_WR], sm[PIO_WR]);
+		read_res(&res, res_buffer, sizeof(res_buffer), rd_dma_chan);
+		cnt++;
     }
 }

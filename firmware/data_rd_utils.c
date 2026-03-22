@@ -20,14 +20,17 @@ uint init_rd_dma_channel(PIO pio, uint sm){
 }
 
 void setup_rd_dma_res_stream(uint dma_chan, size_t l, uint8_t* buffer, size_t bl, PIO pio, uint sm){
-	size_t tc = (l + PIO_FIFO_W-1)/ PIO_FIFO_W;	
+	hard_assert(l % PIO_FIFO_W == 0);
+	size_t tc = l;
 	hard_assert(tc <= bl*PIO_FIFO_W);
 	hard_assert(tc);
 	hard_assert(buffer);
+	#ifndef DEBUG_NO_CHECK
 	hard_assert(!dma_channel_is_busy(dma_chan));
+	#endif
 
-	// clear hash, helps with debug
-	memset(buffer, 0, bl);
+	// fill buffer with 1s, helps with debug
+	memset(buffer, 0xff, bl);
 	// clear fifo, might have one entry due to extra push 
 	pio_sm_clear_fifos(pio, sm);
 
@@ -35,20 +38,13 @@ void setup_rd_dma_res_stream(uint dma_chan, size_t l, uint8_t* buffer, size_t bl
 	dma_channel_set_transfer_count(dma_chan, tc, true);	
 }
 
-void read_res(uint8_t* res, size_t l, uint8_t *buffer, size_t bl, uint dma_chan){
+void read_res(data_t* res, uint8_t *buffer, size_t bl, uint dma_chan){
+	#ifndef DEBUG_NO_CHECK
 	dma_channel_wait_for_finish_blocking(dma_chan);
-	// assume no empty cycle 
-	hard_assert(l <= bl);
-	memset(res, 0, l);
+	#endif
 
-	// filter out invalid data transfers
-	for (size_t i = 0; i < bl-l; i++){
-		if ( buffer[i] != 0){
-			// found our data
-			memcpy(res, &buffer[i], l);
-			break;
-		}
-		if ( i+1 == bl-l) hard_assert(1);
-	}
+	// assume no empty cycle 
+	hard_assert(sizeof(data_t) <= bl);
+	memcpy(res, buffer, sizeof(data_t));
 }
 
