@@ -73,7 +73,7 @@ IBUF m_ibuf_clk(
 // and phase locked on bus clokc
 PLLE2_BASE #(
    .CLKFBOUT_MULT(25),        
-   .CLKIN1_PERIOD(25.0),      
+   .CLKIN1_PERIOD(50.0),      
    .CLKOUT0_DIVIDE(25),
    .DIVCLK_DIVIDE(1)
 ) m_global_clk_pll (
