@@ -6,6 +6,8 @@ complete DFT infrastructure and floating point arithmetics.
 
 It targets the IHP 130 nm `sg13g2`open PDK, has a maximum operating frequency of 100MHz and is taped out as part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
 
+**Documentation on using this accelerator can be found : [here](docs/info.md)**
+
 ![floorplan](docs/floorplan.png) 
 
 ## ASIC 
