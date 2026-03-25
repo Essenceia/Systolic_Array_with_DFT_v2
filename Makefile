@@ -26,7 +26,7 @@ GATE_PHONY_LIB:= lib
 IMPLEM_DIR := final
 SUBMIT_PATH:=$(IMPLEM_DIR)/analog_submission
 
-.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates sdf def gl sc_extract submit
+.PHONY: firmware openocd gdb fpga fpga_prog lint lint_fpga lint_gate_phony tv test gates def gl sc_extract submit
 
 ########
 # Lint #
@@ -86,9 +86,6 @@ LIBRELANE_FINAL:=$(strip $(shell find $(LIBRELANE_RUN_PATH) -type d -name final 
 ifneq ($(LIBRELANE_FINAL),)
 gates:
 	cp $(LIBRELANE_FINAL)/nl/$(PROJET_NAME).nl.v $(IMPLEM_DIR)/.
-	cp $(LIBRELANE_FINAL)/pnl/$(PROJET_NAME).pnl.v $(IMPLEM_DIR)/.
-sdf:
-	cp $(LIBRELANE_FINAL)/sdf/nom_typ_1p20V_25C/* $(IMPLEM_DIR)/.
 def:
 	cp $(LIBRELANE_FINAL)/def/$(PROJET_NAME).def $(IMPLEM_DIR)/.
 else

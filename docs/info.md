@@ -33,7 +33,7 @@ This accelerator uses the following pinout:
 
 This MAC accelerator operates at up to 100MHz and is capable of reaching up to 100 MMAC/s or 200 MFLOPS/s. 
 
-:warning: The outgoing data path on IHP sg13g2 chips has only been proven upwards of 75MHz, so although we will using the maximum theoretical frequency in this discussion it might be necessary to drive this ASIC as a lower clock frequency in practice. 
+:warning: The outgoing data path on IHP sg13g2 chips has only been proven upwards of 75MHz, so although we will using the maximum theoretical frequency in this discussion in practive we will be necessary to drive this ASIC as a lower clock frequency in practice. 
 
 ## Background 
 
