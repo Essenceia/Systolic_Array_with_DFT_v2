@@ -1,10 +1,9 @@
 # Systollic Array with DFT and Floating Point math v2 
 
-
 This project is the second iteration of the systollic array ASIC featuring a more 
 complete DFT infrastructure and floating point arithmetics. 
 
-It targets the IHP 130 nm `sg13g2`open PDK, has a maximum operating frequency of 100MHz and is taped out as part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
+This ASIC targets the IHP 130 nm `sg13g2`open PDK, has a maximum operating frequency of 100MHz and is taped out as part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
 
 **Documentation on using this accelerator can be found : [here](docs/info.md)**
 
