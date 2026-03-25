@@ -326,12 +326,24 @@ Register id mapping for this MAC unit gives us the current:
 | `0x2` | Summand (circulated data) |
 | `0x3` | Multiplication result (internal MAC unit data) |
 
-## Important considerations for usage 
+### Important considerations for usage 
 
 When using the USER_REG custom JTAG TAP instruction, the MAC logic is expected to be temporarily halted, as in no weight or data update operations and no matrix compute is expected to be ongoing.
 To this effect, there is no CDC protection when transferring data between the JTAG clock domain and the MAC domain. If the MAC isn't halted, the resulting metastability risks corrupting the sampled data.
 
 This also applies when doing a boundary scan.
+
+## `SCAN_CHAIN` 
+
+All the `341` sequenctial elements bellonging to the `clk` (systollic array) clock domain are linked in this scan chain. This chain is called `chain_0` and the order 
+of this chaining is defined at the very end of the [`.def` file](../final/tt_um_essen.def). 
+
+This chain is internally connected to the JTAG TAP and can be read with the following code : 
+```tcl
+set sc [read_scan_chain $_CHIPNAME]
+print_scan_chain $sc
+```
+In order to guaranty proper behavior of the scan chain the `clk` clock must follow the `tck` clock, an easy way of doing this is to have the `tck` signal drive the `clk` port. 
 
 ## Quickstart
 
