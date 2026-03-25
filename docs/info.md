@@ -343,7 +343,23 @@ This chain is internally connected to the JTAG TAP and can be read with the foll
 set sc [read_scan_chain $_CHIPNAME]
 print_scan_chain $sc
 ```
-In order to guaranty proper behavior of the scan chain the `clk` clock must follow the `tck` clock, an easy way of doing this is to have the `tck` signal drive the `clk` port. 
+
+I have named the scan chain internal value dump `jul-dump`. 
+
+Note: In order to guaranty proper behavior of the scan chain the `clk` clock must follow the `tck` clock, an easy way of doing this is to have the `tck` signal drive the `clk` port. 
+
+### Scan chain read example 
+
+Output of a jul-dump (scan chain read) using the OpenOCD script: 
+```
+Starting jul-dump
+Scan chain value chain_0:
+00 -   m_2x2_systolic_mac.m_fsm.en_q_sg13g2_dfrbpq_1_Q ( IN SCD ) ( OUT Q )
+00 -   m_2x2_systolic_mac.data_flow_right\[3\]\[3\]_sg13g2_dfrbpq_1_Q ( IN SCD ) ( OUT Q )
+01 -   m_2x2_systolic_mac.data_input_q\[3\]_sg13g2_dfrbpq_1_Q ( IN SCD ) ( OUT Q )
+00 -   m_2x2_systolic_mac.data_input_q\[11\]_sg13g2_dfrbpq_1_Q ( IN SCD ) ( OUT Q )
+00 -   m_2x2_systolic_mac.data_flow_right\[1\]\[3\]_sg13g2_dfrbpq_1_Q ( IN SCD ) ( OUT Q )
+```
 
 ## Quickstart
 
