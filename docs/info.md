@@ -346,7 +346,8 @@ print_scan_chain $sc
 
 I have named the scan chain internal value dump `jul-dump`. 
 
-Note: In order to guaranty proper behavior of the scan chain the `clk` clock must follow the `tck` clock, an easy way of doing this is to have the `tck` signal drive the `clk` port. 
+Note: In order to guaranty proper behavior of the scan chain the `clk` clock must follow the `tck` clock. The `clk` signal must have a rising edge during the `tck` periode, preferable not to 
+close to a `tck` rising edge. A 180% phase offset is ideal. 
 
 ### Scan chain read example 
 
