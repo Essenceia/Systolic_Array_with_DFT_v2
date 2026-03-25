@@ -17,7 +17,7 @@ frequency experiements suggest a 75 MHz maximum, and the JTAG 2 MHz.
 
 There are currently no known manufacturability issues.
 
-Current status: Taped-in, in fabrication, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/). 
+Current status: Taped-in, in fabrication, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/). \
 Chip expected: 2026-07-31
 
 ![global placement git](docs/global_placement/placement.gif)
