@@ -77,7 +77,7 @@ Each MAC unit calculates the MAC operation $c_{(t,x,y)}$, where :
 c_{(t,x,y)} = i_{(t,y)} \times w_{(x,y)} + c_{(t-1,x,y-1)}
 ```
 
-Given this accelerator was designed to operate on 16-bit floating point numbers, 
+Given this accelerator was designed to operate on 16 bit floating point numbers, 
 there is no need for an additional clamping step. 
 
 
@@ -126,7 +126,7 @@ Notes:
 ### Resetting MAC 
 
 Given we are not sending an index alongside each data transfer to indicate which weight/data coordinates ( index ) each data corresponds to, 
-the MAC accelerator keeps track of the next index internally. As such, if due to external reasons a partial transfer occurs, it becomes necessary 
+the MAC accelerator keeps track of the next index internally. As such, on init or if due to external reasons a partial transfer occurs, it becomes necessary 
 to reset this index using the reset sequence described below. 
 
 The weights streaming indexes and the data streaming indexes can be reset independently, each requires a single data
@@ -151,8 +151,7 @@ Configuring the weights takes 8 data transfer cycles, during which :
 
 #### Example 
 
-:warning: These examples are using a simplified model using unsigned 16 bit number, the 
-bus protocol behavior stays is exactly the same as in the final ASIC. 
+:warning: The waveforms used as examples below were produced by the top-level simulator using a simplified model where the base data type is an unsigned 16 bit number. Apart from the data type, the bus protocol behavior is exactly the same as in the final ASIC.
 
 In this example we are configuring the weight matrix $W$ to : 
 ```math
@@ -195,6 +194,9 @@ Sending the input matrix takes 8 data transfer cycles, during which :
 
 #### Example
 
+
+:warning: The waveforms used as examples below were produced by the top-level simulator using a simplified model where the base data type is an unsigned 16 bit number. Apart from the data type, the bus protocol behavior is exactly the same as in the final ASIC.
+
 In this example we are sending the input data matrix $I$ : 
 ```math
 I = 
@@ -218,6 +220,9 @@ data transfer starts. The two result streams occure back-to-back this will not o
 
 #### Simple example
 
+
+:warning: The waveforms used as examples below were produced by the top-level simulator using a simplified model where the base data type is an unsigned 16 bit number. Apart from the data type, the bus protocol behavior is exactly the same as in the final ASIC.
+
 In this example the $W$ MAC weight matrix is being configured and the $I$ data is being streamed in, following which, the $R$ result starts being sent out. 
 ```math
 R = I \times W = 
@@ -240,14 +245,14 @@ R = I \times W =
 ![result waves](res.png)
 
 
-
 ### Real world example with bfloat16
 
-Given the above example are using the simplified unsigned 16 bit model used by the 
-simulator: here is an example captured from the xilinix ILA core during bringup of the 
-firmware with an emulated version of this ASIC on the FPGA. 
+Given that the examples above use the simplified unsigned 16 bit model from the simulator, here is a capture from the Xilinx ILA core 
+taken during firmware bringup. 
 
-This is capturing the real world result of the following matrix multiplications:
+This is the real-world behavior of an emulated version of this ASIC running on the FPGA.
+
+This capture represents the actual result of the following matrix multiplications:
 
 ```math
 R = I \times W = 
