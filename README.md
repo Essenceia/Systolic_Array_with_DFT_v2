@@ -1,19 +1,28 @@
 # Systollic Array with DFT and Floating Point math v2 
 
-Second iteration on the systollic array targetting IHP 130 nm `sg13g2` 
-open PDK, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
+
+This project is the second iteration of the systollic array ASIC featuring a more 
+complete DFT infrastructure and floating point arithmetics. 
+
+It targets the IHP 130 nm `sg13g2`open PDK, has a maximum operating frequency of 100MHz and is taped out as part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/).
 
 ![floorplan](docs/floorplan.png) 
 
-## Improvements on v1 
+## ASIC 
 
-[Link to v1, tapedout on GlobalFoundary 180nm, part of Tiny Tapeout experimental shuttle `gf0p2`](https://github.com/Essenceia/Systolic_MAC_with_DFT)
+This accelerator was designed for the IHP 130nm node using the sg13g2 PDK. It occupies 126,685 µm² of die area and has a target typical operating voltage of 1.2V at 25°C.
 
-- signed intergers upgraded to floating point math using `bfloat16`
-- systollic array flops part of scan chain for debugging, hocked up to JTAG, accessible though private JTAG instruction (documented in [datasheet](docs/info.md))
-- higher clock frequency: max 100MHz target
+This design features two clock trees, one for the MAC and another for the JTAG TAP. The MAC clock targets a 100 MHz maximum operating frequency, but current output GPIO 
+frequency experiements suggest a 75 MHz maximum, and the JTAG 2 MHz.
 
-### Floating point math 
+There are currently no known manufacturability issues.
+
+Current status: Taped-in, in fabrication, part of the Tiny Tapeout [ihp26a shuttle](https://tinytapeout.com/). 
+Chip expected: 2026-07-31
+
+![global placement git](docs/global_pleaament/placement.gif)
+
+## Floating point math 
 
 This design will be including a from scratch custom implementation of the 
 bfloat16 artithemtic optimized for performance and area. 
@@ -29,22 +38,6 @@ These choices are :
 - no $\pm \infty$ or `NaN` support
 
 For more information refer to the [bfloat repository](https://github.com/Essenceia/BFloat16)
-
-## Dependancies
-
-In order to add the DFT scan chain this project rellies on a custom version of librelane 
-found [here](https://github.com/Essenceia/librelane) on branch `dft_scan_chain`. 
-
-Then, since the scan chain is hooking up to an internal component and not top level I/O pins
-and there was a small bug in the syntax of the output def file format produced by openROAD 
-we must also run a different openROAD version than the default version used by librelane `3.0.0rc0`. 
-Yet, because of a breaking change in openSTA, I have backported this def writer fix to a 
-older version of openROAD. 
-So now we have both a custom librelane and openROAD version. 
-
-This custom openROAD can be found [here](https://github.com/Essenceia/OpenROAD) on branch `librelane_300rc0` and will be 
-automatically used instead of the default version on nix shells. 
-
 
 # DFT 
 
@@ -69,36 +62,6 @@ All four standard instructions `EXTEST`, `IDCODE`, `SAMPLE_PRELOAD`, `BYPASS` co
 
 `SCAN_CHAIN` is a private JTAG instruction used for observing the systolic array's flops state. The order of the flop chain can be found at the end of the [`.def` file](../final/tt_um_essen.def) in the definition of the `chain_0` scan chain.
 
-## `USER_REG`
-
-The `USER_REG` state was designed to probe into the data currently used by each of the 4 MAC units.
-The data to be read is specified by loading its address in the data register during a previous `DR_SHIFT` stage. As such, two sequences of `DR_SHIFTS` might be necessary:
-1. Load the address of the next data
-2. Read the data off TDO
-
-The address and data are both `16` bits wide, though only the bottom 4 bits of the address are used.
-
-### Address format
-The address uses the following format:
-```
-[ unused 15:4 ][ mac unit 3:2 ][ register id 1:0 ] 
-```
-Register id mapping for each MAC unit gives us the current:
-
-| Register ID | Description |
-|---|---|
-| `0x0` | Weight (multiplier) |
-| `0x1` | Multiplicand (circulated data) |
-| `0x2` | Summand (circulated data) |
-| `0x3` | Multiplication result (internal MAC unit data) |
-
-## Important considerations for usage 
-
-When using the USER_REG custom JTAG TAP instruction, the MAC logic is expected to be temporarily halted, as in no weight or data update operations and no matrix compute is expected to be ongoing.
-To this effect, there is no CDC protection when transferring data between the JTAG clock domain and the MAC domain. If the MAC isn't halted, the resulting metastability risks corrupting the sampled data.
-
-This also applies when doing a boundary scan.
-
 ## Quickstart
 
 For quickly getting started, use the utilities provided in `jtag/openocd.cfg`.
@@ -109,6 +72,7 @@ source [find interface/jlink.cfg]
 ```
 
 ### Usage 
+
 Run using : 
 ```
 openocd -f jtag/openocd.cfg
@@ -147,6 +111,29 @@ Info : Listening on port 6666 for tcl connections
 Info : Listening on port 4444 for telnet connections
 ...
 ```
+
+## Improvements on v1 
+
+[Link to v1, tapedout on GlobalFoundary 180nm, part of Tiny Tapeout experimental shuttle `gf0p2`](https://github.com/Essenceia/Systolic_MAC_with_DFT)
+
+- signed intergers upgraded to floating point math using `bfloat16`
+- systollic array flops part of scan chain for debugging, hocked up to JTAG, accessible though private JTAG instruction (documented in [datasheet](docs/info.md))
+- higher clock frequency: max 100MHz target
+
+## Dependancies
+
+In order to add the DFT scan chain this project rellies on a custom version of librelane 
+found [here](https://github.com/Essenceia/librelane) on branch `dft_scan_chain`. 
+
+Then, since the scan chain is hooking up to an internal component and not top level I/O pins
+and there was a small bug in the syntax of the output def file format produced by openROAD 
+we must also run a different openROAD version than the default version used by librelane `3.0.0rc0`. 
+Yet, because of a breaking change in openSTA, I have backported this def writer fix to a 
+older version of openROAD. 
+So now we have both a custom librelane and openROAD version. 
+
+This custom openROAD can be found [here](https://github.com/Essenceia/OpenROAD) on branch `librelane_300rc0` and will be 
+automatically used instead of the default version on nix shells. 
 
 ## License
 
