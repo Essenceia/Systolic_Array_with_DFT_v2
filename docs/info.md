@@ -139,16 +139,20 @@ transfer cycle during which :
 
 In this example we are resetting both the data streaming index and the weight index back to back. 
 
-TODO rst_waves.png
+![rst waves](rst_waves.png)
 
 ### Configure weights
 
 Configuring the weights takes 8 data transfer cycles, during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i[1:0]` is set to `0x0` indicating we are sending `weights`
+- `data_mode_i[1:0]` is set to `0x1` indicating we are sending `weights`
 - `data_i[7:0]` contains the weights
 
+
 #### Example 
+
+:warning: These examples are using a simplified model using unsigned 16 bit number, the 
+bus protocol behavior stays is exactly the same as in the final ASIC. 
 
 In this example we are configuring the weight matrix $W$ to : 
 ```math
@@ -158,7 +162,8 @@ W =
 2 & 3 
 \end{pmatrix} 
 ```
-TODO wr_weights_waves.png
+
+![configurating weights](conf_weights.png)
 
 #### Debug
 
@@ -198,7 +203,8 @@ I =
 6 & 7 
 \end{pmatrix} 
 ```
-TODO wr_data_waves.png
+
+![configure data waves](conf_data.png) 
 
 ### Receiving result
 
@@ -230,15 +236,46 @@ R = I \times W =
 14 & 27
 \end{pmatrix}
 ```
-TODO rd_res_waves.png
 
-#### Complex example 
+![result waves](res.png)
 
-Internally, the accelerator takes at most 8 cycles to produce a result from incoming data. This accounts for incoming data latching, circulating the data through the entire systolic array, and output streaming. The accelerator moves the incoming data through the array as soon as it is available. Because of this, and since this accelerator supports gaps in the incoming data stream, if, for example, the last data transfer of $i_{(1,1)}$ ​is delayed by at least 2 cycles, then the accelerator result will start streaming out before all of the input matrix has finished streaming in.
 
-This is why, in the firmware (`firmware/main.c`), we set up the DMA stream to receive the data before we start sending the input matrix, as the gap between sending and getting the result is too small for the controlling MCU to perform any type of compute.
 
-TODO rd_res_complex_waves.png
+### Real world example with bfloat16
+
+Given the above example are using the simplified unsigned 16 bit model used by the 
+simulator: here is an example captured from the xilinix ILA core during bringup of the 
+firmware with an emulated version of this ASIC on the FPGA. 
+
+This is capturing the real world result of the following matrix multiplications:
+
+```math
+R = I \times W = 
+\begin{pmatrix} 
++0.0 & 1.0 \\ 
+2.0 & 3.0 
+\end{pmatrix}
+\times
+\begin{pmatrix} 
++0.0 & 1.0 \\ 
+2.0 & 3.0 
+\end{pmatrix}
+=
+\begin{pmatrix} 
+2.0 & 3.0 \\ 
+6.0 & 11.0
+\end{pmatrix}
+```
+
+Bfloat16 representations for reference : 
+- $+0.0$ `0x0000`
+- $1.0$ `0x3f80`
+- $2.0$ `0x4000`
+- $3.0$ `0x4040`
+- $6.0$ `0x40c0`
+- $11.0$ `0x4130`
+
+![ILA core capture](ila.png) 
 
 # DFT 
 
