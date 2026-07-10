@@ -61,7 +61,7 @@ Its instruction register length is `3`, and implements the following instruction
 
 All four standard instructions `EXTEST`, `IDCODE`, `SAMPLE_PRELOAD`, `BYPASS` conform to the standard behavior.
 
-`SCAN_CHAIN` is a private JTAG instruction used for observing the systolic array's flops state. The order of the flop chain can be found at the end of the [`.def` file](../final/tt_um_essen.def) in the definition of the `chain_0` scan chain.
+`SCAN_CHAIN` is a private JTAG instruction used for observing the systolic array's flops state. The order of the flop chain can be found at the end of the [`.def` file](final/tt_um_essen.def) in the definition of the `chain_0` scan chain.
 
 ## Quickstart
 
