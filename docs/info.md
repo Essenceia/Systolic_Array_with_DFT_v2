@@ -132,7 +132,7 @@ to reset this index using the reset sequence described below.
 The weights streaming indexes and the data streaming indexes can be reset independently, each requires a single data
 transfer cycle during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i[1:0]` is set to `0x3` if we are resetting both the weight and the data indexes
+- `data_mode_i[1:0]` is set to `0x2` if we are resetting both the weight and the data indexes
 - `data_i[7:0]` is ignored
 
 #### Example
@@ -189,7 +189,7 @@ read internal register 0:3 : 0x0000 - multiplication result (internal computatio
 
 Sending the input matrix takes 8 data transfer cycles, during which : 
 - `data_v_i` is set to `1`
-- `data_mode_i[1:0]` is set to `0x1` indicating we are sending the input matrix
+- `data_mode_i[1:0]` is set to `0x0` indicating we are sending the input matrix
 - `data_i[7:0]` contains the input data
 
 #### Example
